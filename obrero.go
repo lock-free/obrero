@@ -60,6 +60,7 @@ func MaintainConnectionWithNA(NAHost string, NAPort int, generateSandbox gopcp_r
 	}
 }
 
+// Define a worker by passing `generateSandbox` function
 func StartBlockWorker(generateSandbox gopcp_rpc.GenerateSandbox) {
 	StartWorker(generateSandbox)
 	// blocking forever

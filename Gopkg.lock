@@ -52,10 +52,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  input-imports = [
-    "github.com/idata-shopee/gopcp",
-    "github.com/idata-shopee/gopcp_rpc",
-    "github.com/idata-shopee/gopcp_stream",
-  ]
+  input-imports = ["github.com/idata-shopee/gopcp_rpc"]
   solver-name = "gps-cdcl"
   solver-version = 1
