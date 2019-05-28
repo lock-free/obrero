@@ -67,6 +67,7 @@ func (naPools *NAPools) CallProxy(serviceType string, list gopcp.CallResult, tim
 
 	// 2. call NA proxy
 	str, _ := client.PcpClient.ToJSON(client.PcpClient.Call("proxy", serviceType, list))
+	log.Println(str)
 	return client.Call(client.PcpClient.Call("proxy", serviceType, list), timeout)
 }
 
