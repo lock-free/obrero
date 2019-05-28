@@ -2,8 +2,10 @@ package obrero
 
 import (
 	"errors"
+	"github.com/idata-shopee/gopcp"
 	"github.com/idata-shopee/gopcp_rpc"
 	"github.com/idata-shopee/gopool"
+	"math/rand"
 	"os"
 	"strconv"
 	"strings"
@@ -44,10 +46,57 @@ func ParseNAs(nas string) ([]NA, error) {
 }
 
 type WorkerStartConf struct {
-	PoolSize      int
-	Duration      time.Duration
-	RetryDuration time.Duration
+	PoolSize            int
+	Duration            time.Duration
+	RetryDuration       time.Duration
+	NAGetClientMaxRetry int
 }
+
+type NAPools struct {
+	Pools             []*gopool.Pool
+	GetClientMaxRetry int
+}
+
+func (naPools *NAPools) CallProxy(serviceType string, list gopcp.CallResult, timeout time.Duration) (interface{}, error) {
+	// 1. pickup a NA connection
+	client, err := naPools.GetItem()
+	if err != nil {
+		return nil, err
+	}
+
+	// 2. call NA proxy
+	return client.Call(client.PcpClient.Call("proxy", serviceType, list), timeout)
+}
+
+func (naPools *NAPools) GetItem() (*gopcp_rpc.PCPConnectionHandler, error) {
+	return naPools.getItem(0, naPools.GetClientMaxRetry)
+}
+
+func (naPools *NAPools) getItem(tryCount int, maxCount int) (*gopcp_rpc.PCPConnectionHandler, error) {
+	if tryCount > maxCount {
+		return nil, errors.New("fail to get a connection from NA pools, tried 3 times")
+	}
+
+	index := rand.Intn(len(naPools.Pools))
+
+	item, err := naPools.Pools[index].Get()
+
+	if err != nil {
+		return naPools.getItem(tryCount+1, maxCount)
+	} else {
+		client, ok := item.(*gopcp_rpc.PCPConnectionHandler)
+		if !ok {
+			return naPools.getItem(tryCount+1, maxCount)
+		} else {
+			return client, nil
+		}
+	}
+}
+
+// TODO
+// func (naPools *NAPools) CallProxyStream() (interface{}, error) {
+// 	// 1. pickup a
+// }
 
 // Define a worker by passing `generateSandbox` function
 func StartBlockWorker(generateSandbox gopcp_rpc.GenerateSandbox, workerStartConf WorkerStartConf) {
@@ -58,7 +107,7 @@ func StartBlockWorker(generateSandbox gopcp_rpc.GenerateSandbox, workerStartConf
 	wg.Wait()
 }
 
-func StartWorker(generateSandbox gopcp_rpc.GenerateSandbox, workerStartConf WorkerStartConf) []*gopool.Pool {
+func StartWorker(generateSandbox gopcp_rpc.GenerateSandbox, workerStartConf WorkerStartConf) NAPools {
 	nas, err := ParseNAs(MustEnvOption("NAs"))
 	if err != nil {
 		panic(err)
@@ -78,7 +127,10 @@ func StartWorker(generateSandbox gopcp_rpc.GenerateSandbox, workerStartConf Work
 		pools = append(pools, pool)
 	}
 
-	return pools
+	return NAPools{
+		Pools:             pools,
+		GetClientMaxRetry: workerStartConf.NAGetClientMaxRetry,
+	}
 }
 
 func MustEnvOption(envName string) string {
