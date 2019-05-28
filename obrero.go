@@ -5,6 +5,7 @@ import (
 	"github.com/idata-shopee/gopcp"
 	"github.com/idata-shopee/gopcp_rpc"
 	"github.com/idata-shopee/gopool"
+	"log"
 	"math/rand"
 	"os"
 	"strconv"
@@ -65,6 +66,7 @@ func (naPools *NAPools) CallProxy(serviceType string, list gopcp.CallResult, tim
 	}
 
 	// 2. call NA proxy
+	log.Println(client.PcpClient.Call("proxy", serviceType, list))
 	return client.Call(client.PcpClient.Call("proxy", serviceType, list), timeout)
 }
 
