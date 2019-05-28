@@ -3,7 +3,7 @@ package obrero
 import (
 	"errors"
 	"github.com/idata-shopee/gopcp_rpc"
-	"log"
+	"github.com/idata-shopee/gopool"
 	"os"
 	"strconv"
 	"strings"
@@ -43,33 +43,22 @@ func ParseNAs(nas string) ([]NA, error) {
 	return ans, nil
 }
 
-func MaintainConnectionWithNA(NAHost string, NAPort int, generateSandbox gopcp_rpc.GenerateSandbox) {
-	log.Printf("try to connect to NA %s:%d\n", NAHost, NAPort)
-	_, err := gopcp_rpc.GetPCPRPCClient(NAHost, NAPort, generateSandbox, func(err error) {
-		log.Printf("connection to NA %s:%d broken, error is %v\n", NAHost, NAPort, err)
-		time.Sleep(2 * time.Second)
-		MaintainConnectionWithNA(NAHost, NAPort, generateSandbox)
-	})
-
-	if err != nil {
-		log.Printf("fail to connect to NA %s:%d\n", NAHost, NAPort)
-		time.Sleep(2 * time.Second)
-		MaintainConnectionWithNA(NAHost, NAPort, generateSandbox)
-	} else {
-		log.Printf("connected to NA %s:%d\n", NAHost, NAPort)
-	}
+type WorkerStartConf struct {
+	PoolSize      int
+	Duration      time.Duration
+	RetryDuration time.Duration
 }
 
 // Define a worker by passing `generateSandbox` function
-func StartBlockWorker(generateSandbox gopcp_rpc.GenerateSandbox) {
-	StartWorker(generateSandbox)
+func StartBlockWorker(generateSandbox gopcp_rpc.GenerateSandbox, workerStartConf WorkerStartConf) {
+	StartWorker(generateSandbox, workerStartConf)
 	// blocking forever
 	var wg sync.WaitGroup
 	wg.Add(1)
 	wg.Wait()
 }
 
-func StartWorker(generateSandbox gopcp_rpc.GenerateSandbox) {
+func StartWorker(generateSandbox gopcp_rpc.GenerateSandbox, workerStartConf WorkerStartConf) []*gopool.Pool {
 	nas, err := ParseNAs(MustEnvOption("NAs"))
 	if err != nil {
 		panic(err)
@@ -79,9 +68,17 @@ func StartWorker(generateSandbox gopcp_rpc.GenerateSandbox) {
 		panic(errors.New("missing NAs config"))
 	}
 
+	var pools []*gopool.Pool
+
 	for _, na := range nas {
-		MaintainConnectionWithNA(na.Host, na.Port, generateSandbox)
+		pool := gopcp_rpc.GetPCPRPCPool(func() (string, int, error) {
+			return na.Host, na.Port, nil
+		}, generateSandbox, workerStartConf.PoolSize, workerStartConf.Duration, workerStartConf.RetryDuration)
+
+		pools = append(pools, pool)
 	}
+
+	return pools
 }
 
 func MustEnvOption(envName string) string {
