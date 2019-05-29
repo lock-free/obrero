@@ -63,24 +63,7 @@ func (naPools *NAPools) CallProxy(serviceType string, list gopcp.CallResult, tim
 		return nil, err
 	}
 
-	code, err := client.PcpClient.ToJSON(list)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return client.Call(client.PcpClient.Call("proxy", serviceType, code, timeout.Seconds()), timeout)
-}
-
-func (naPools *NAPools) CallProxyRemote(serviceType string, code string, timeout time.Duration) (interface{}, error) {
-	// 1. pickup a NA connection
-	client, err := naPools.GetItem()
-	if err != nil {
-		return nil, err
-	}
-
-	// 2. call NA proxy
-	return client.Call(client.PcpClient.Call("proxy", serviceType, code, timeout.Seconds()), timeout)
+	return client.Call(client.PcpClient.Call("proxy", serviceType, client.PcpClient.Call("'", list), timeout.Seconds()), timeout)
 }
 
 func (naPools *NAPools) GetItem() (*gopcp_rpc.PCPConnectionHandler, error) {
