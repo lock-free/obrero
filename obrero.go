@@ -2,9 +2,9 @@ package obrero
 
 import (
 	"errors"
-	"github.com/idata-shopee/gopcp"
-	"github.com/idata-shopee/gopcp_rpc"
-	"github.com/idata-shopee/gopool"
+	"github.com/lock-free/gopcp"
+	"github.com/lock-free/gopcp_rpc"
+	"github.com/lock-free/gopool"
 	"math/rand"
 	"os"
 	"strconv"
