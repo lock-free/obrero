@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/lock-free/gopcp"
 	"github.com/lock-free/gopcp_rpc"
+	"github.com/lock-free/gopcp_stream"
 	"github.com/lock-free/gopool"
 	"math/rand"
 	"os"
@@ -59,11 +60,27 @@ type NAPools struct {
 
 func (naPools *NAPools) CallProxy(serviceType string, list gopcp.CallResult, timeout time.Duration) (interface{}, error) {
 	client, err := naPools.GetItem()
+
 	if err != nil {
 		return nil, err
 	}
 
 	return client.Call(client.PcpClient.Call("proxy", serviceType, client.PcpClient.Call("'", list), timeout.Seconds()), timeout)
+}
+
+func (naPools *NAPools) CallProxyStream(serviceType string, list gopcp.CallResult, streamCallback gopcp_stream.StreamCallbackFunc, timeout time.Duration) (interface{}, error) {
+	client, err := naPools.GetItem()
+
+	if err != nil {
+		return nil, err
+	}
+
+	sexp, err := client.StreamClient.StreamCall("proxyStream", serviceType, client.PcpClient.Call("'", list), timeout.Seconds(), streamCallback)
+	if err != nil {
+		return nil, err
+	}
+
+	return client.Call(*sexp, timeout)
 }
 
 func (naPools *NAPools) GetItem() (*gopcp_rpc.PCPConnectionHandler, error) {
