@@ -19,7 +19,7 @@ import (
 // 1. parse NAs variable from env
 // 2. maintain connections to NAs
 
-// NAs: 127.0.0.1:8000;123.109.89.10:7000
+// eg: NAs=127.0.0.1:8000;123.109.89.10:7000
 type NA struct {
 	Host string
 	Port int
@@ -108,11 +108,6 @@ func (naPools *NAPools) getItem(tryCount int, maxCount int) (*gopcp_rpc.PCPConne
 	}
 }
 
-// TODO
-// func (naPools *NAPools) CallProxyStream() (interface{}, error) {
-// 	// 1. pickup a
-// }
-
 // Define a worker by passing `generateSandbox` function
 func StartBlockWorker(generateSandbox gopcp_rpc.GenerateSandbox, workerStartConf WorkerStartConf) {
 	StartWorker(generateSandbox, workerStartConf)
@@ -128,6 +123,10 @@ func StartWorker(generateSandbox gopcp_rpc.GenerateSandbox, workerStartConf Work
 		panic(err)
 	}
 
+	return StartWorkerWithNAs(generateSandbox, workerStartConf, nas)
+}
+
+func StartWorkerWithNAs(generateSandbox gopcp_rpc.GenerateSandbox, workerStartConf WorkerStartConf, nas []NA) NAPools {
 	if len(nas) < 0 {
 		panic(errors.New("missing NAs config"))
 	}
