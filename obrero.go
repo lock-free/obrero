@@ -113,7 +113,10 @@ func (naPools *NAPools) getItem(tryCount int, maxCount int) (*gopcp_rpc.PCPConne
 // Define a worker by passing `generateSandbox` function
 func StartBlockWorker(generateSandbox gopcp_rpc.GenerateSandbox, workerStartConf WorkerStartConf) {
 	StartWorker(generateSandbox, workerStartConf)
-	// blocking forever
+	RunForever()
+}
+
+func RunForever() {
 	var wg sync.WaitGroup
 	wg.Add(1)
 	wg.Wait()
