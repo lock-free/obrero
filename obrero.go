@@ -1,11 +1,13 @@
 package obrero
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/lock-free/gopcp"
 	"github.com/lock-free/gopcp_rpc"
 	"github.com/lock-free/gopcp_stream"
 	"github.com/lock-free/gopool"
+	"io/ioutil"
 	"math/rand"
 	"os"
 	"strconv"
@@ -153,4 +155,12 @@ func MustEnvOption(envName string) string {
 	} else {
 		return v
 	}
+}
+
+func ReadJson(filePath string, f interface{}) error {
+	source, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal([]byte(source), f)
 }
