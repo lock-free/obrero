@@ -70,6 +70,16 @@ func (naPools *NAPools) CallProxy(serviceType string, list gopcp.CallResult, tim
 	return client.Call(client.PcpClient.Call("proxy", serviceType, client.PcpClient.Call("'", list), timeout.Seconds()), timeout)
 }
 
+func (naPools *NAPools) CallProxyById(serviceId string, serviceType string, list gopcp.CallResult, timeout time.Duration) (interface{}, error) {
+	client, err := naPools.GetItem()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return client.Call(client.PcpClient.Call("proxyById", serviceId, serviceType, client.PcpClient.Call("'", list), timeout.Seconds()), timeout)
+}
+
 func (naPools *NAPools) CallProxyStream(serviceType string, list gopcp.CallResult, streamCallback gopcp_stream.StreamCallbackFunc, timeout time.Duration) (interface{}, error) {
 	client, err := naPools.GetItem()
 
@@ -103,6 +113,7 @@ func (naPools *NAPools) getItem(tryCount int, maxCount int) (*gopcp_rpc.PCPConne
 	} else {
 		client, ok := item.(*gopcp_rpc.PCPConnectionHandler)
 		if !ok {
+			// TODO sleep a while before retry
 			return naPools.getItem(tryCount+1, maxCount)
 		} else {
 			return client, nil
@@ -122,6 +133,8 @@ func RunForever() {
 	wg.Wait()
 }
 
+// when start a worker, will parse env variable NAs, and then
+// connect to them.
 func StartWorker(generateSandbox gopcp_rpc.GenerateSandbox, workerStartConf WorkerStartConf) NAPools {
 	nas, err := ParseNAs(MustEnvOption("NAs"))
 	if err != nil {
