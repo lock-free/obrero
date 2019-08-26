@@ -15,34 +15,79 @@ type NAPools struct {
 	GetClientMaxRetry int
 }
 
-func (naPools *NAPools) CallProxy(serviceType string, list gopcp.CallResult, timeout time.Duration) (interface{}, error) {
+func (naPools *NAPools) CallProxy(serviceType string,
+	exp gopcp.CallResult,
+	timeout time.Duration) (interface{}, error) {
 	client, err := naPools.GetRandomItem()
 
 	if err != nil {
 		return nil, err
 	}
 
-	return client.Call(client.PcpClient.Call("proxy", serviceType, client.PcpClient.Call("'", list), timeout.Seconds()), timeout)
+	return naPools.CallNAProxy(client, serviceType, exp, timeout)
 }
 
-func (naPools *NAPools) CallProxyById(serviceId string, serviceType string, list gopcp.CallResult, timeout time.Duration) (interface{}, error) {
-	client, err := naPools.GetRandomItem()
-
-	if err != nil {
-		return nil, err
-	}
-
-	return client.Call(client.PcpClient.Call("proxyById", serviceId, serviceType, client.PcpClient.Call("'", list), timeout.Seconds()), timeout)
+func (naPools *NAPools) CallNAProxy(client *gopcp_rpc.PCPConnectionHandler,
+	serviceType string,
+	exp gopcp.CallResult,
+	timeout time.Duration) (interface{}, error) {
+	return client.Call(client.PcpClient.Call(
+		"proxy",
+		serviceType,
+		client.PcpClient.Call("'", exp),
+		timeout.Seconds()), timeout)
 }
 
-func (naPools *NAPools) CallProxyStream(serviceType string, list gopcp.CallResult, streamCallback gopcp_stream.StreamCallbackFunc, timeout time.Duration) (interface{}, error) {
+func (naPools *NAPools) CallProxyById(serviceId string,
+	serviceType string,
+	exp gopcp.CallResult,
+	timeout time.Duration) (interface{}, error) {
 	client, err := naPools.GetRandomItem()
 
 	if err != nil {
 		return nil, err
 	}
 
-	sexp, err := client.StreamClient.StreamCall("proxyStream", serviceType, client.PcpClient.Call("'", list), timeout.Seconds(), streamCallback)
+	return naPools.CallNAProxyById(client, serviceId, serviceType, exp, timeout)
+}
+
+func (naPools *NAPools) CallNAProxyById(client *gopcp_rpc.PCPConnectionHandler,
+	serviceId string,
+	serviceType string,
+	exp gopcp.CallResult,
+	timeout time.Duration) (interface{}, error) {
+	return client.Call(client.PcpClient.Call(
+		"proxyById",
+		serviceId,
+		serviceType,
+		client.PcpClient.Call("'", exp),
+		timeout.Seconds()), timeout)
+}
+
+func (naPools *NAPools) CallProxyStream(serviceType string,
+	exp gopcp.CallResult,
+	streamCallback gopcp_stream.StreamCallbackFunc,
+	timeout time.Duration) (interface{}, error) {
+	client, err := naPools.GetRandomItem()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return naPools.CallNAProxyStream(client, serviceType, exp, streamCallback, timeout)
+}
+
+func (naPools *NAPools) CallNAProxyStream(client *gopcp_rpc.PCPConnectionHandler,
+	serviceType string,
+	exp gopcp.CallResult,
+	streamCallback gopcp_stream.StreamCallbackFunc,
+	timeout time.Duration) (interface{}, error) {
+	sexp, err := client.StreamClient.StreamCall("proxyStream",
+		serviceType,
+		client.PcpClient.Call("'", exp),
+		timeout.Seconds(),
+		streamCallback)
+
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +100,7 @@ func (naPools *NAPools) GetRandomItem() (*gopcp_rpc.PCPConnectionHandler, error)
 	return naPools.getRandomItem(0, naPools.GetClientMaxRetry)
 }
 
-func (naPools *NAPools) hashNA(key []byte) (*gopcp_rpc.PCPConnectionHandler, error) {
+func (naPools *NAPools) HashNA(key []byte) (*gopcp_rpc.PCPConnectionHandler, error) {
 	index := getHash(key) % len(naPools.Pools)
 
 	item, err := naPools.Pools[index].Get()
@@ -65,7 +110,7 @@ func (naPools *NAPools) hashNA(key []byte) (*gopcp_rpc.PCPConnectionHandler, err
 
 	client, ok := item.(*gopcp_rpc.PCPConnectionHandler)
 	if !ok {
-		return nil, errors.New("unexpected error at hashNA")
+		return nil, errors.New("unexpected error at HashNA")
 	} else {
 		return client, nil
 	}
