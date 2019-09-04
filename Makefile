@@ -15,5 +15,10 @@ update-dep:
 
 test:
 	@go test -v -race
+	@cd ./utils && go test -v
+
+cover:
+	@go test -coverprofile=coverage.out && go tool cover -html=coverage.out
+	@cd ./utils && go test -coverprofile=coverage.out && go tool cover -html=coverage.out
 
 .PHONY: test
