@@ -100,8 +100,9 @@ func (naPools *NAPools) GetRandomItem() (*gopcp_rpc.PCPConnectionHandler, error)
 	return naPools.getRandomItem(0, naPools.GetClientMaxRetry)
 }
 
-func (naPools *NAPools) HashNA(key []byte) (*gopcp_rpc.PCPConnectionHandler, error) {
-	index := getHash(key) % len(naPools.Pools)
+// pick up NA by hash key
+func (naPools *NAPools) HashNA(key string) (*gopcp_rpc.PCPConnectionHandler, error) {
+	index := getHash([]byte(key)) % len(naPools.Pools)
 
 	item, err := naPools.Pools[index].Get()
 	if err != nil {
