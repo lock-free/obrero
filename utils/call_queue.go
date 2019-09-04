@@ -2,6 +2,7 @@ package utils
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 	"sync/atomic"
 )
@@ -104,4 +105,12 @@ func (cqm *CallQueueMap) Enqueue(key string, data interface{}) (interface{}, err
 		}
 	}()
 	return cq.Enqueue(data)
+}
+
+var CALL_QUEUE_DEF_EXECUTOR = func(data interface{}) (interface{}, error) {
+	fn, ok := data.(func() (interface{}, error))
+	if !ok {
+		return nil, fmt.Errorf("expect data as function in queue map, but get %v", data)
+	}
+	return fn()
 }
