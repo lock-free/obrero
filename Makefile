@@ -19,6 +19,7 @@ test:
 	@cd ./utils/cq && go test -v -race
 	@cd ./utils/dlb && go test -v -race
 	@cd ./mids && go test -v -race
+	@cd ./box/cqbox && go test -v -race
 
 cover:
 	@go test -coverprofile=coverage.out && go tool cover -html=coverage.out
