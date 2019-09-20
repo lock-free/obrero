@@ -1,19 +1,8 @@
 package utils
 
 import (
-	"fmt"
 	"testing"
 )
-
-func assertEqual(t *testing.T, expect interface{}, actual interface{}, message string) {
-	if expect == actual {
-		return
-	}
-	if len(message) == 0 {
-		message = fmt.Sprintf("expect %v !=  actual %v", expect, actual)
-	}
-	t.Fatal(message)
-}
 
 func TestParseArgs(t *testing.T) {
 	var (
@@ -22,9 +11,9 @@ func TestParseArgs(t *testing.T) {
 		c bool
 	)
 	ParseArgs([]interface{}{12, "123", true}, []interface{}{&a, &b, &c}, "")
-	assertEqual(t, a, 12, "")
-	assertEqual(t, b, "123", "")
-	assertEqual(t, c, true, "")
+	AssertEqual(t, a, 12, "")
+	AssertEqual(t, b, "123", "")
+	AssertEqual(t, c, true, "")
 }
 
 func TestParseArgs2(t *testing.T) {
@@ -33,8 +22,8 @@ func TestParseArgs2(t *testing.T) {
 		"key":  "v1",
 		"key2": 12,
 	}}, []interface{}{&a}, "")
-	assertEqual(t, a["key"], "v1", "")
-	assertEqual(t, a["key2"], float64(12), "")
+	AssertEqual(t, a["key"], "v1", "")
+	AssertEqual(t, a["key2"], float64(12), "")
 }
 
 func TestParseArgs3(t *testing.T) {

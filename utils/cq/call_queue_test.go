@@ -1,7 +1,7 @@
 package cq
 
 import (
-	"fmt"
+	"github.com/lock-free/obrero/utils"
 	"sync"
 	"testing"
 	"time"
@@ -25,7 +25,7 @@ func TestCallQueue(t *testing.T) {
 	}
 
 	for i := 0; i < 1000; i++ {
-		assertEqual(t, i*i, list[i], "")
+		utils.AssertEqual(t, i*i, list[i], "")
 	}
 }
 
@@ -55,7 +55,7 @@ func TestCallQueue2(t *testing.T) {
 	}
 
 	wg.Wait()
-	assertEqual(t, sum, count, "")
+	utils.AssertEqual(t, sum, count, "")
 }
 
 func TestCallQueueMap(t *testing.T) {
@@ -91,17 +91,7 @@ func TestCallQueueMap(t *testing.T) {
 	wg.Wait()
 	for _, key := range ks {
 		for i := 0; i < n; i++ {
-			assertEqual(t, listMap[key][i], i*i, "")
+			utils.AssertEqual(t, listMap[key][i], i*i, "")
 		}
 	}
-}
-
-func assertEqual(t *testing.T, expect interface{}, actual interface{}, message string) {
-	if expect == actual {
-		return
-	}
-	if len(message) == 0 {
-		message = fmt.Sprintf("expect %v !=  actual %v", expect, actual)
-	}
-	t.Fatal(message)
 }

@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"sync"
+	"testing"
 )
 
 func MustEnvOption(envName string) string {
@@ -60,4 +61,14 @@ func RunForever() {
 	var wg sync.WaitGroup
 	wg.Add(1)
 	wg.Wait()
+}
+
+func AssertEqual(t *testing.T, expect interface{}, actual interface{}, message string) {
+	if expect == actual {
+		return
+	}
+	if len(message) == 0 {
+		message = fmt.Sprintf("expect %v !=  actual %v", expect, actual)
+	}
+	t.Fatal(message)
 }

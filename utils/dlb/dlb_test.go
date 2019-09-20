@@ -1,19 +1,9 @@
 package dlb
 
 import (
-	"fmt"
+	"github.com/lock-free/obrero/utils"
 	"testing"
 )
-
-func assertEqual(t *testing.T, expect interface{}, actual interface{}, message string) {
-	if expect == actual {
-		return
-	}
-	if len(message) == 0 {
-		message = fmt.Sprintf("expect %v !=  actual %v", expect, actual)
-	}
-	t.Fatal(message)
-}
 
 func TestBase(t *testing.T) {
 	wlb := GetWorkerLB()
@@ -25,23 +15,23 @@ func TestBase(t *testing.T) {
 
 	for i := 0; i < 100; i++ {
 		_, ok := wlb.PickUpWorkerRandom("a")
-		assertEqual(t, ok, true, "")
+		utils.AssertEqual(t, ok, true, "")
 	}
 
 	for i := 0; i < 100; i++ {
 		_, ok := wlb.PickUpWorkerRandom("b")
-		assertEqual(t, ok, false, "")
+		utils.AssertEqual(t, ok, false, "")
 	}
 
 	wlb.RemoveWorker(w1)
 	for i := 0; i < 100; i++ {
 		_, ok := wlb.PickUpWorkerRandom("a")
-		assertEqual(t, ok, true, "")
+		utils.AssertEqual(t, ok, true, "")
 	}
 	wlb.RemoveWorker(w2)
 	for i := 0; i < 100; i++ {
 		_, ok := wlb.PickUpWorkerRandom("a")
-		assertEqual(t, ok, false, "")
+		utils.AssertEqual(t, ok, false, "")
 	}
 }
 
@@ -50,9 +40,9 @@ func TestRemoveFalsy(t *testing.T) {
 
 	w1 := Worker{Id: "0", Group: "a"}
 	w2 := Worker{Id: "1", Group: "a"}
-	assertEqual(t, wlb.RemoveWorker(w1), false, "")
+	utils.AssertEqual(t, wlb.RemoveWorker(w1), false, "")
 	wlb.AddWorker(w2)
-	assertEqual(t, wlb.RemoveWorker(w2), true, "")
+	utils.AssertEqual(t, wlb.RemoveWorker(w2), true, "")
 	wlb.AddWorker(w1)
-	assertEqual(t, wlb.RemoveWorker(w1), true, "")
+	utils.AssertEqual(t, wlb.RemoveWorker(w1), true, "")
 }
