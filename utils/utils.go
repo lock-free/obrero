@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strconv"
 	"sync"
 )
 
@@ -14,6 +15,14 @@ func MustEnvOption(envName string) string {
 	} else {
 		return v
 	}
+}
+
+func MustEnvIntOption(envName string) int {
+	intv, err := strconv.Atoi(MustEnvOption(envName))
+	if err != nil {
+		panic("Env PORT must be a number.")
+	}
+	return intv
 }
 
 func ReadJson(filePath string, f interface{}) error {
