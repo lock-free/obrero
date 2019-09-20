@@ -1,16 +1,13 @@
 package obrero
 
 import (
-	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/lock-free/gopcp_rpc"
 	"github.com/lock-free/gopool"
-	"io/ioutil"
-	"os"
+	"github.com/lock-free/obrero/napool"
+	"github.com/lock-free/obrero/utils"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 )
 
@@ -56,19 +53,13 @@ type WorkerStartConf struct {
 // Define a worker by passing `generateSandbox` function
 func StartBlockWorker(generateSandbox gopcp_rpc.GenerateSandbox, workerStartConf WorkerStartConf) {
 	StartWorker(generateSandbox, workerStartConf)
-	RunForever()
-}
-
-func RunForever() {
-	var wg sync.WaitGroup
-	wg.Add(1)
-	wg.Wait()
+	utils.RunForever()
 }
 
 // when start a worker, will parse env variable NAs, and then
 // connect to them.
-func StartWorker(generateSandbox gopcp_rpc.GenerateSandbox, workerStartConf WorkerStartConf) NAPools {
-	nas, err := ParseNAs(MustEnvOption("NAs"))
+func StartWorker(generateSandbox gopcp_rpc.GenerateSandbox, workerStartConf WorkerStartConf) napool.NAPools {
+	nas, err := ParseNAs(utils.MustEnvOption("NAs"))
 	if err != nil {
 		panic(err)
 	}
@@ -76,7 +67,7 @@ func StartWorker(generateSandbox gopcp_rpc.GenerateSandbox, workerStartConf Work
 	return StartWorkerWithNAs(generateSandbox, workerStartConf, nas)
 }
 
-func StartWorkerWithNAs(generateSandbox gopcp_rpc.GenerateSandbox, workerStartConf WorkerStartConf, nas []NA) NAPools {
+func StartWorkerWithNAs(generateSandbox gopcp_rpc.GenerateSandbox, workerStartConf WorkerStartConf, nas []NA) napool.NAPools {
 	if len(nas) < 0 {
 		panic(errors.New("missing NAs config"))
 	}
@@ -91,47 +82,8 @@ func StartWorkerWithNAs(generateSandbox gopcp_rpc.GenerateSandbox, workerStartCo
 		pools = append(pools, pool)
 	}
 
-	return NAPools{
+	return napool.NAPools{
 		Pools:             pools,
 		GetClientMaxRetry: workerStartConf.NAGetClientMaxRetry,
 	}
-}
-
-func MustEnvOption(envName string) string {
-	if v := os.Getenv(envName); v == "" {
-		panic("missing env " + envName + " which must exists.")
-	} else {
-		return v
-	}
-}
-
-func ReadJson(filePath string, f interface{}) error {
-	source, err := ioutil.ReadFile(filePath)
-	if err != nil {
-		return err
-	}
-	return json.Unmarshal([]byte(source), f)
-}
-
-// parse args and assign values to pointers
-func ParseArgs(args []interface{}, ps []interface{}, errMsg string) error {
-	if len(args) < len(ps) {
-		return fmt.Errorf("missing some args, args=%v, %s", args, errMsg)
-	}
-
-	for i, p := range ps {
-		err := ParseArg(args[i], p)
-		if err != nil {
-			return fmt.Errorf("fail to parse arg at %d, args=%v, %s", i, args, errMsg)
-		}
-	}
-	return nil
-}
-
-func ParseArg(arg interface{}, pointer interface{}) error {
-	bs, err := json.Marshal(arg)
-	if err != nil {
-		return err
-	}
-	return json.Unmarshal(bs, pointer)
 }

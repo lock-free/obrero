@@ -1,4 +1,4 @@
-package obrero
+package napool
 
 import (
 	"errors"
@@ -11,6 +11,7 @@ import (
 )
 
 type NAPools struct {
+	// create a pool for each NA
 	Pools             []*gopool.Pool
 	GetClientMaxRetry int
 }
@@ -97,7 +98,11 @@ func (naPools *NAPools) CallNAProxyStream(client *gopcp_rpc.PCPConnectionHandler
 
 // pick up a random item
 func (naPools *NAPools) GetRandomItem() (*gopcp_rpc.PCPConnectionHandler, error) {
-	return naPools.getRandomItem(0, naPools.GetClientMaxRetry)
+	item, err := naPools.getRandomItem(0, naPools.GetClientMaxRetry)
+	if err != nil {
+		return nil, err
+	}
+	return itemToPcpConnectionHandler(item)
 }
 
 // pick up NA by hash key
@@ -108,12 +113,15 @@ func (naPools *NAPools) HashNA(key string) (*gopcp_rpc.PCPConnectionHandler, err
 	if err != nil {
 		return nil, err
 	}
+	return itemToPcpConnectionHandler(item)
+}
 
-	client, ok := item.(*gopcp_rpc.PCPConnectionHandler)
+func itemToPcpConnectionHandler(item interface{}) (*gopcp_rpc.PCPConnectionHandler, error) {
+	v, ok := item.(*gopcp_rpc.PCPConnectionHandler)
 	if !ok {
-		return nil, errors.New("unexpected error at HashNA")
+		return nil, errors.New("expect type of gopcp_rpc.PCPConnectionHandler")
 	} else {
-		return client, nil
+		return v, nil
 	}
 }
 
@@ -130,7 +138,7 @@ func getHash(data []byte) int {
 }
 
 // TODO implement robin-round instead of random
-func (naPools *NAPools) getRandomItem(tryCount int, maxCount int) (*gopcp_rpc.PCPConnectionHandler, error) {
+func (naPools *NAPools) getRandomItem(tryCount int, maxCount int) (interface{}, error) {
 	if tryCount > maxCount {
 		return nil, errors.New("fail to get a connection from NA pools, tried 3 times")
 	}
@@ -143,12 +151,6 @@ func (naPools *NAPools) getRandomItem(tryCount int, maxCount int) (*gopcp_rpc.PC
 	if err != nil {
 		return naPools.getRandomItem(tryCount+1, maxCount)
 	} else {
-		client, ok := item.(*gopcp_rpc.PCPConnectionHandler)
-		if !ok {
-			// TODO sleep a while before retry
-			return naPools.getRandomItem(tryCount+1, maxCount)
-		} else {
-			return client, nil
-		}
+		return item, nil
 	}
 }

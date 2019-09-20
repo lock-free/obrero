@@ -27,37 +27,3 @@ func TestParseNAs2(t *testing.T) {
 	assertEqual(t, v[0], NA{"127.0.0.1", 8001}, "")
 	assertEqual(t, v[1], NA{"120.130.140.2", 9087}, "")
 }
-
-func TestParseArgs(t *testing.T) {
-	var (
-		a int
-		b string
-		c bool
-	)
-	ParseArgs([]interface{}{12, "123", true}, []interface{}{&a, &b, &c}, "")
-	assertEqual(t, a, 12, "")
-	assertEqual(t, b, "123", "")
-	assertEqual(t, c, true, "")
-}
-
-func TestParseArgs2(t *testing.T) {
-	a := make(map[string]interface{})
-	ParseArgs([]interface{}{map[string]interface{}{
-		"key":  "v1",
-		"key2": 12,
-	}}, []interface{}{&a}, "")
-	assertEqual(t, a["key"], "v1", "")
-	assertEqual(t, a["key2"], float64(12), "")
-}
-
-func TestParseArgs3(t *testing.T) {
-	type Person struct {
-		Name string
-		Age  int
-	}
-	var p Person
-	ParseArgs([]interface{}{map[string]interface{}{
-		"Name": "a",
-		"Age":  12,
-	}}, []interface{}{&p}, "")
-}

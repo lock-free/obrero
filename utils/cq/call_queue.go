@@ -1,4 +1,5 @@
-package utils
+// Package cq provides apis to make calls in sequential way
+package cq
 
 import (
 	"errors"
@@ -25,6 +26,7 @@ type CallQueue struct {
 	executor func(interface{}) (interface{}, error)
 }
 
+// initialize a CallQueue
 func GetCallQueue(executor func(interface{}) (interface{}, error)) *CallQueue {
 	var queue []Task
 	var qlock sync.Mutex
@@ -32,7 +34,7 @@ func GetCallQueue(executor func(interface{}) (interface{}, error)) *CallQueue {
 	return &CallQueue{&queue, &qlock, &flag, executor}
 }
 
-// run in order
+// push a data to queue
 func (cq *CallQueue) Enqueue(data interface{}) (interface{}, error) {
 	var task = Task{data, make(chan TaskResult, 1)}
 
