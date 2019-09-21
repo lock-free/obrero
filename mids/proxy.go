@@ -1,8 +1,10 @@
 package mids
 
 import (
+	"fmt"
 	"github.com/lock-free/gopcp"
 	"github.com/lock-free/gopcp_rpc"
+	"github.com/lock-free/gopcp_stream"
 	"github.com/lock-free/obrero/utils"
 	"time"
 )
@@ -47,4 +49,62 @@ func (this *ProxyMid) Proxy(args []interface{}, attachment interface{}, pcpServe
 	}
 
 	return handle.CallRemote(string(bs), time.Duration(timeout)*time.Second)
+}
+
+// LazyStreamApi
+// (xxxx, serviceType, exp, timeout)
+func (this *ProxyMid) ProxyStream(streamProducer gopcp_stream.StreamProducer, args []interface{}, attachment interface{}, pcpServer *gopcp.PcpServer) (interface{}, error) {
+	// parse params
+	var (
+		serviceType string
+		exp         interface{}
+		timeout     int
+	)
+
+	err := utils.ParseArgs(args, []interface{}{&serviceType, &exp, &timeout}, "wrong signature, expect (proxy, serviceType: string, exp, timeout: int)")
+	exp = args[1]
+
+	if err != nil {
+		return nil, err
+	}
+
+	var timeoutD = time.Duration(timeout) * time.Second
+
+	jsonObj := gopcp.ParseAstToJsonObject(exp)
+
+	switch arr := jsonObj.(type) {
+	case []interface{}:
+		// choose worker
+		handle, err := this.GetWorkerHandler(serviceType)
+		if err != nil {
+			return nil, err
+		}
+
+		// pipe stream
+		sparams, err := handle.StreamClient.ParamsToStreamParams(append(arr[1:], func(t int, d interface{}) {
+			// write response of stream back to client
+			switch t {
+			case gopcp_stream.STREAM_DATA:
+				streamProducer.SendData(d, timeoutD)
+			case gopcp_stream.STREAM_END:
+				streamProducer.SendEnd(timeoutD)
+			default:
+				errMsg, ok := d.(string)
+				if !ok {
+					streamProducer.SendError(fmt.Sprintf("errored at stream, and responsed error message is not string. d=%v", d), timeoutD)
+				} else {
+					streamProducer.SendError(errMsg, timeoutD)
+				}
+			}
+		}))
+
+		if err != nil {
+			return nil, err
+		}
+
+		// send a stream request to service
+		return handle.Call(gopcp.CallResult{append([]interface{}{arr[0]}, sparams...)}, timeoutD)
+	default:
+		return nil, fmt.Errorf("Expect array, but got %v, args=%v", jsonObj, args)
+	}
 }
