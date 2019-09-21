@@ -37,3 +37,11 @@ func TestParseArgs3(t *testing.T) {
 		"Age":  12,
 	}}, []interface{}{&p}, "")
 }
+
+func TestParseArgMap(t *testing.T) {
+	var a int
+	var b string
+	ParseArgMap(map[string]interface{}{"a": 123, "b": "hello"}, map[string]interface{}{"a": &a, "b": &b}, "")
+	AssertEqual(t, a, 123, "")
+	AssertEqual(t, b, "hello", "")
+}

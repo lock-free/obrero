@@ -49,6 +49,22 @@ func ParseArgs(args []interface{}, ps []interface{}, errMsg string) error {
 	return nil
 }
 
+// @param argMap arg as a map
+// @param pm point map
+func ParseArgMap(argMap map[string]interface{}, pm map[string]interface{}, errMsg string) error {
+	for key, p := range pm {
+		v, ok := argMap[key]
+		if !ok {
+			return fmt.Errorf("fail to parse arg at %s, argMap=%v, %s", key, argMap, errMsg)
+		}
+		err := ParseArg(v, p)
+		if err != nil {
+			return fmt.Errorf("fail to parse arg at %s, argMap=%v, %s", key, argMap, errMsg)
+		}
+	}
+	return nil
+}
+
 func ParseArg(arg interface{}, pointer interface{}) error {
 	bs, err := json.Marshal(arg)
 	if err != nil {
