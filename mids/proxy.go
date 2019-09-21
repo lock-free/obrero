@@ -10,13 +10,24 @@ import (
 )
 
 type GetWorkerHandlerFun func(string) (*gopcp_rpc.PCPConnectionHandler, error)
+type GetCommandFun func(interface{}) (string, error)
 
 type ProxyMid struct {
 	GetWorkerHandler GetWorkerHandlerFun
+	GetCommand       GetCommandFun
 }
 
-func GetProxyMid(getWorkerHandler GetWorkerHandlerFun) *ProxyMid {
-	return &ProxyMid{getWorkerHandler}
+func DefaultGetCommand(exp interface{}) (string, error) {
+	// convert exp to json string
+	bs, err := gopcp.JSONMarshal(gopcp.ParseAstToJsonObject(exp))
+	if err != nil {
+		return "", err
+	}
+	return string(bs), nil
+}
+
+func GetProxyMid(getWorkerHandler GetWorkerHandlerFun, getCommand GetCommandFun) *ProxyMid {
+	return &ProxyMid{getWorkerHandler, getCommand}
 }
 
 // lazy sandbox
@@ -42,13 +53,14 @@ func (this *ProxyMid) Proxy(args []interface{}, attachment interface{}, pcpServe
 		return nil, err
 	}
 
-	// convert exp to json string
-	bs, err := gopcp.JSONMarshal(gopcp.ParseAstToJsonObject(exp))
+	// translate exp to command
+	cmd, err := this.GetCommand(exp)
 	if err != nil {
 		return nil, err
 	}
 
-	return handle.CallRemote(string(bs), time.Duration(timeout)*time.Second)
+	// call real service
+	return handle.CallRemote(cmd, time.Duration(timeout)*time.Second)
 }
 
 // LazyStreamApi
