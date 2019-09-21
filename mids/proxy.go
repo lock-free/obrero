@@ -10,14 +10,14 @@ import (
 )
 
 type GetWorkerHandlerFun func(string) (*gopcp_rpc.PCPConnectionHandler, error)
-type GetCommandFun func(interface{}) (string, error)
+type GetCommandFun func(interface{}, string, int, interface{}, *gopcp.PcpServer) (string, error)
 
 type ProxyMid struct {
 	GetWorkerHandler GetWorkerHandlerFun
 	GetCommand       GetCommandFun
 }
 
-func DefaultGetCommand(exp interface{}) (string, error) {
+func DefaultGetCommand(exp interface{}, serviceType string, timeout int, attachment interface{}, pcpServer *gopcp.PcpServer) (string, error) {
 	// convert exp to json string
 	bs, err := gopcp.JSONMarshal(gopcp.ParseAstToJsonObject(exp))
 	if err != nil {
@@ -54,7 +54,7 @@ func (this *ProxyMid) Proxy(args []interface{}, attachment interface{}, pcpServe
 	}
 
 	// translate exp to command
-	cmd, err := this.GetCommand(exp)
+	cmd, err := this.GetCommand(exp, serviceType, timeout, attachment, pcpServer)
 	if err != nil {
 		return nil, err
 	}
