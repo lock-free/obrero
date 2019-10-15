@@ -34,7 +34,7 @@ type StdWorkerConfig struct {
 }
 
 // (pool, config pointer, stream)
-type GetBoxFuncMap = func(*napool.NAPools, interface{}, *gopcp_stream.StreamServer) map[string]*gopcp.BoxFunc
+type GetBoxFuncMap = func(*napool.NAPools, *gopcp_stream.StreamServer) map[string]*gopcp.BoxFunc
 
 // appConfig: pointer of appConfig
 func StartStdWorker(appConfig interface{}, getBoxFuncMap GetBoxFuncMap, stdWorkerConfig StdWorkerConfig) {
@@ -58,7 +58,7 @@ func StartStdWorker(appConfig interface{}, getBoxFuncMap GetBoxFuncMap, stdWorke
 	}
 
 	naPools = obrero.StartWorker(func(s *gopcp_stream.StreamServer) *gopcp.Sandbox {
-		boxFuncMap := getBoxFuncMap(&naPools, appConfig, s)
+		boxFuncMap := getBoxFuncMap(&naPools, s)
 
 		for key, boxFunc := range boxFuncMap {
 			// log function
