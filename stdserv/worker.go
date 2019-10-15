@@ -31,6 +31,7 @@ type StdWorkerConfig struct {
 	ServiceName       string
 	AppConfigFilePath *string
 	WorkerStartConf   *obrero.WorkerStartConf
+	BeforeStartWorker func()
 }
 
 // (pool, config pointer, stream)
@@ -55,6 +56,11 @@ func StartStdWorker(appConfig interface{}, getBoxFuncMap GetBoxFuncMap, stdWorke
 	var workerStartConf = DEFAULT_WORKER_START_CONF
 	if stdWorkerConfig.WorkerStartConf != nil {
 		workerStartConf = *stdWorkerConfig.WorkerStartConf
+	}
+
+	// before start worker
+	if stdWorkerConfig.BeforeStartWorker != nil {
+		stdWorkerConfig.BeforeStartWorker()
 	}
 
 	naPools = obrero.StartWorker(func(s *gopcp_stream.StreamServer) *gopcp.Sandbox {
