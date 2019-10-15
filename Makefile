@@ -21,6 +21,7 @@ test:
 	@cd ./mids && go test -v -race
 	@cd ./mids/httpmids && go test -v -race
 	@cd ./box/cqbox && go test -v -race
+	@cd ./stdserv && go test -v -race
 
 cover:
 	@go test -coverprofile=coverage.out && go tool cover -html=coverage.out
