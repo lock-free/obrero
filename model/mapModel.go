@@ -24,12 +24,8 @@ func GetMapModel(naPools *napool.NAPools, DB string, key string) *MapModel {
 	}
 }
 
-func (m MapModel) Get(modelPointer interface{}) error {
-	d, err := m.naPools.CallProxy("db_obrero", pcpClient.Call("getByKey", m.DB, m.key, 120), 120*time.Second)
-	if err != nil {
-		return err
-	}
-	return utils.ParseArg(d, modelPointer)
+func (m MapModel) Get() (interface{}, error) {
+	return m.naPools.CallProxy("db_obrero", pcpClient.Call("getByKey", m.DB, m.key, 120), 120*time.Second)
 }
 
 func (m MapModel) Set(v interface{}) (interface{}, error) {
@@ -38,4 +34,12 @@ func (m MapModel) Set(v interface{}) (interface{}, error) {
 
 func (m MapModel) Delete() (interface{}, error) {
 	return m.naPools.CallProxy("db_obrero", pcpClient.Call("deleteByKey", m.DB, m.key, 120), 120*time.Second)
+}
+
+func (m MapModel) AssignTo(modelPointer interface{}) error {
+	d, err := m.naPools.CallProxy("db_obrero", pcpClient.Call("getByKey", m.DB, m.key, 120), 120*time.Second)
+	if err != nil {
+		return err
+	}
+	return utils.ParseArg(d, modelPointer)
 }
