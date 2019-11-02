@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"sync"
 	"testing"
+	"time"
 )
 
 func MustEnvOption(envName string) string {
@@ -87,4 +88,8 @@ func AssertEqual(t *testing.T, expect interface{}, actual interface{}, message s
 		message = fmt.Sprintf("expect %v !=  actual %v", expect, actual)
 	}
 	t.Fatal(message)
+}
+
+func MakeTimestamp() int64 {
+	return time.Now().UnixNano() / int64(time.Millisecond)
 }
