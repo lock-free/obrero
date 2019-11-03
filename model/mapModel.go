@@ -15,15 +15,13 @@ type MapModel struct {
 	DB      string
 	key     string
 	naPools *napool.NAPools
-	Example interface{}
 }
 
-func GetMapModel(naPools *napool.NAPools, DB string, key string, example interface{}) *MapModel {
+func GetMapModel(naPools *napool.NAPools, DB string, key string) *MapModel {
 	return &MapModel{
 		DB:      DB,
 		key:     key,
 		naPools: naPools,
-		Example: example,
 	}
 }
 
@@ -31,14 +29,8 @@ func (m MapModel) Get() (interface{}, error) {
 	return m.naPools.CallProxy("db_obrero", pcpClient.Call("getByKey", m.DB, m.key, 120), 120*time.Second)
 }
 
+// TODO check
 func (m MapModel) Set(v interface{}) (interface{}, error) {
-	// check type
-	var cp = m.Example
-	err := utils.ParseArg(v, &cp)
-	if err != nil {
-		return nil, err
-	}
-
 	return m.naPools.CallProxy("db_obrero", pcpClient.Call("setByKey", m.DB, m.key, v, 120), 120*time.Second)
 }
 
