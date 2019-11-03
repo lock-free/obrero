@@ -10,10 +10,12 @@ import (
 var pcpClient = gopcp.PcpClient{}
 
 // MapModel, provides simple apis to access DB model
+// TODO define constraints on model
 type MapModel struct {
 	DB      string
 	key     string
 	naPools *napool.NAPools
+	Example interface{}
 }
 
 func GetMapModel(naPools *napool.NAPools, DB string, key string) *MapModel {
@@ -29,6 +31,13 @@ func (m MapModel) Get() (interface{}, error) {
 }
 
 func (m MapModel) Set(v interface{}) (interface{}, error) {
+	// check type
+	var cp = m.Example
+	err := utils.ParseArg(v, &cp)
+	if err != nil {
+		return nil, err
+	}
+
 	return m.naPools.CallProxy("db_obrero", pcpClient.Call("setByKey", m.DB, m.key, v, 120), 120*time.Second)
 }
 
