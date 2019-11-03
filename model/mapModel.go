@@ -18,11 +18,12 @@ type MapModel struct {
 	Example interface{}
 }
 
-func GetMapModel(naPools *napool.NAPools, DB string, key string) *MapModel {
+func GetMapModel(naPools *napool.NAPools, DB string, key string, example interface{}) *MapModel {
 	return &MapModel{
 		DB:      DB,
 		key:     key,
 		naPools: naPools,
+		Example: example,
 	}
 }
 
