@@ -23,6 +23,7 @@ test:
 	@cd ./box/cqbox && go test -v -race
 	@cd ./stdserv && go test -v -race
 	@cd ./model && go test -v -race
+	@cd ./model/entowner && go test -v -race
 
 cover:
 	@go test -coverprofile=coverage.out && go tool cover -html=coverage.out
