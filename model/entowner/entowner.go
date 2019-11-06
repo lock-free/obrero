@@ -1,6 +1,7 @@
 package entowner
 
 import (
+	"errors"
 	"github.com/lock-free/gopcp"
 	"github.com/lock-free/obrero/model"
 	"github.com/lock-free/obrero/napool"
@@ -49,11 +50,22 @@ func (eo EntOnwer) DeleteEnt(naPools *napool.NAPools, oid, eid string) (interfac
 	return naPools.CallProxy("model_obrero", pcpClient.Call("deleteEntity", eo.EntityKey, eid), 120*time.Second)
 }
 
-func (eo EntOnwer) GetEnt(naPools *napool.NAPools, oid, eid string) (interface{}, error) {
+func (eo EntOnwer) GetEnt(naPools *napool.NAPools, oid, eid string) (map[string]interface{}, error) {
 	if err := eo.checkPermission(naPools, oid, eid); err != nil {
 		return nil, err
 	}
-	return naPools.CallProxy("model_obrero", pcpClient.Call("getEntity", eo.EntityKey, eid), 120*time.Second)
+	v, err := naPools.CallProxy("model_obrero", pcpClient.Call("getEntity", eo.EntityKey, eid), 120*time.Second)
+	if err != nil {
+		return nil, err
+	}
+
+	ent, ok := v.(map[string]interface{})
+
+	if !ok {
+		return nil, errors.New("type error for entity, expect map[string]interface{}")
+	}
+
+	return ent, nil
 }
 
 func (eo EntOnwer) GetEnts(naPools *napool.NAPools, oid string) (interface{}, error) {
