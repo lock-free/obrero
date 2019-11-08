@@ -74,6 +74,7 @@
     "github.com/lock-free/gopcp_rpc",
     "github.com/lock-free/gopcp_stream",
     "github.com/lock-free/gopool",
+    "github.com/satori/go.uuid",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -47,6 +47,12 @@ func (eo EntOnwer) DeleteEnt(naPools *napool.NAPools, oid, eid string) (interfac
 	if err := eo.checkPermission(naPools, oid, eid); err != nil {
 		return nil, err
 	}
+	// delete relationship
+	_, err := naPools.CallProxy("model_obrero", pcpClient.Call("deleteRel", eo.EntityKey, eid), 120*time.Second)
+	if err != nil {
+		return nil, err
+	}
+	// delete enti
 	return naPools.CallProxy("model_obrero", pcpClient.Call("deleteEntity", eo.EntityKey, eid), 120*time.Second)
 }
 
