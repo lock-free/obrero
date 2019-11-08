@@ -44,11 +44,11 @@ func (eo EntOnwer) SetEnt(naPools *napool.NAPools, oid, eid string, entity map[s
 }
 
 func (eo EntOnwer) DeleteEnt(naPools *napool.NAPools, oid, eid string) (interface{}, error) {
-	if err := eo.checkPermission(naPools, oid, eid); err != nil {
-		return nil, err
-	}
+	// if err := eo.checkPermission(naPools, oid, eid); err != nil {
+	// 	return nil, err
+	// }
 	// delete relationship
-	_, err := naPools.CallProxy("model_obrero", pcpClient.Call("deleteRel", eo.EntityKey, oid, eid), 120*time.Second)
+	_, err := naPools.CallProxy("model_obrero", pcpClient.Call("deleteRel", eo.RelKey, oid, eid), 120*time.Second)
 	if err != nil {
 		return nil, err
 	}
