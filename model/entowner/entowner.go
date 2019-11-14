@@ -75,5 +75,6 @@ func (eo EntOnwer) GetEnt(naPools *napool.NAPools, oid, eid string) (map[string]
 }
 
 func (eo EntOnwer) GetEnts(naPools *napool.NAPools, oid string) (interface{}, error) {
+	// TODO check have rels, if dosen't have rels, return empty array
 	return naPools.CallProxy("model_obrero", pcpClient.Call("getRels", eo.RelKey, oid), 120*time.Second)
 }
