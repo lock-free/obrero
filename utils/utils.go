@@ -93,3 +93,29 @@ func AssertEqual(t *testing.T, expect interface{}, actual interface{}, message s
 func MakeTimestamp() int64 {
 	return time.Now().UnixNano() / int64(time.Millisecond)
 }
+
+func Assign(target map[string]interface{}, source map[string]interface{}) map[string]interface{} {
+	ans := make(map[string]interface{})
+
+	for k, v := range target {
+		ans[k] = v
+	}
+
+	for k, v := range source {
+		ans[k] = v
+	}
+
+	return ans
+}
+
+func Pick(m map[string]interface{}, fields []string) map[string]interface{} {
+	ans := make(map[string]interface{})
+
+	for _, field := range fields {
+		if v, ok := m[field]; ok {
+			ans[field] = v
+		}
+	}
+
+	return ans
+}
