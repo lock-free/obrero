@@ -27,12 +27,29 @@ func MustEnvIntOption(envName string) int {
 	return intv
 }
 
+func ExistsFile(filename string) bool {
+	info, err := os.Stat(flename)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return !info.IsDir()
+}
+
 func ReadJson(filePath string, f interface{}) error {
 	source, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return err
 	}
 	return json.Unmarshal([]byte(source), f)
+}
+
+func WriteJson(filePath string, v interface{}) error {
+	bs, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	return ioutil.WriteFile(filePath, bs, 0644)
 }
 
 // parse args and assign values to pointers
