@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -44,4 +45,26 @@ func TestParseArgMap(t *testing.T) {
 	ParseArgMap(map[string]interface{}{"a": 123, "b": "hello"}, map[string]interface{}{"a": &a, "b": &b}, "")
 	AssertEqual(t, a, 123, "")
 	AssertEqual(t, b, "hello", "")
+}
+
+func TestPick(t *testing.T) {
+	AssertEqual(t,
+		reflect.DeepEqual(Pick(map[string]interface{}{"a": 1, "b": 2, "c": 3}, []string{}), map[string]interface{}{}),
+		true,
+		"")
+	AssertEqual(t,
+		reflect.DeepEqual(Pick(map[string]interface{}{"a": 1, "b": 2, "c": 3}, []string{"a", "b"}), map[string]interface{}{"a": 1, "b": 2}),
+		true,
+		"")
+	AssertEqual(t,
+		reflect.DeepEqual(Pick(map[string]interface{}{"a": 1, "b": 2, "c": 3}, []string{"a", "b", "e"}), map[string]interface{}{"a": 1, "b": 2}),
+		true,
+		"")
+}
+
+func TestAssign(t *testing.T) {
+	AssertEqual(t,
+		reflect.DeepEqual(Assign(map[string]interface{}{"a": 1, "b": 2}, map[string]interface{}{"c": 3}), map[string]interface{}{"a": 1, "b": 2, "c": 3}),
+		true,
+		"")
 }
