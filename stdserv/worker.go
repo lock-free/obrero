@@ -17,7 +17,7 @@ import (
 
 const (
 	DEFAULT_APP_CONFIG = "/data/app.json"
-	SERVICE_STATE_FILE = "/data/__sevice_state.json"
+	SERVICE_STATE_FILE = "/data/__service_state.json"
 )
 
 var DEFAULT_WORKER_START_CONF = obrero.WorkerStartConf{
