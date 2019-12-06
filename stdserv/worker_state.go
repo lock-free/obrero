@@ -20,6 +20,7 @@ type State struct {
 	Data    interface{} `json:"data"`
 }
 
+// read state from state file
 func GetWorkerState(stateFilePath string) (*WorkerState, error) {
 	// if no state file, create a new one
 	if !utils.ExistsFile(stateFilePath) {
@@ -45,8 +46,9 @@ func GetWorkerState(stateFilePath string) (*WorkerState, error) {
 	return workerState, nil
 }
 
+// flush current state to file
 func (ws WorkerState) UpdateState() error {
-	return utils.WriteJson(ws.stateFilePath, ws.state)
+	return utils.WriteJson(ws.StateFilePath, ws.State)
 }
 
 func createInitialState(stateFilePath string) error {

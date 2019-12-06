@@ -28,7 +28,7 @@ func MustEnvIntOption(envName string) int {
 }
 
 func ExistsFile(filename string) bool {
-	info, err := os.Stat(flename)
+	info, err := os.Stat(filename)
 	if os.IsNotExist(err) {
 		return false
 	}
