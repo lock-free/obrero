@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"reflect"
 	"strconv"
 	"sync"
 	"testing"
@@ -98,7 +99,7 @@ func RunForever() {
 }
 
 func AssertEqual(t *testing.T, expect interface{}, actual interface{}, message string) {
-	if expect == actual {
+	if reflect.DeepEqual(expect, actual) {
 		return
 	}
 	if len(message) == 0 {
