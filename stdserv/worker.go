@@ -39,7 +39,8 @@ type StdWorkerConfig struct {
 type GetBoxFuncMap = func(*napool.NAPools, *WorkerState, *gopcp_stream.StreamServer) map[string]*gopcp.BoxFunc
 
 // appConfig: pointer of appConfig
-func StartStdWorker(appConfig interface{}, getBoxFuncMap GetBoxFuncMap, stdWorkerConfig StdWorkerConfig) {
+// appState: pointer of appState
+func StartStdWorker(appConfig interface{}, appState interface{}, getBoxFuncMap GetBoxFuncMap, stdWorkerConfig StdWorkerConfig) {
 	// read config from config file
 	appConfigFilePath := DEFAULT_APP_CONFIG
 	if stdWorkerConfig.AppConfigFilePath != nil {
@@ -55,6 +56,13 @@ func StartStdWorker(appConfig interface{}, getBoxFuncMap GetBoxFuncMap, stdWorke
 	workerState, err := GetWorkerState(SERVICE_STATE_FILE)
 	if err != nil {
 		panic(err)
+	}
+	if appState != nil {
+		err := utils.ParseArg(workerState.State.Data, appState)
+		if err != nil {
+			panic(err)
+		}
+		workerState.State.Data = appState
 	}
 
 	// start worker
