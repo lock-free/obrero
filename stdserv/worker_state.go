@@ -3,6 +3,7 @@ package stdserv
 import (
 	"github.com/lock-free/obrero/utils"
 	"github.com/satori/go.uuid"
+	"sync"
 )
 
 // Worker can have state:
@@ -13,6 +14,7 @@ import (
 type WorkerState struct {
 	StateFilePath string
 	State         State
+	lock          *sync.Mutex
 }
 
 type State struct {
@@ -38,16 +40,22 @@ func GetWorkerState(stateFilePath string) (*WorkerState, error) {
 		return nil, err
 	}
 
+	var lock sync.Mutex
 	workerState := &WorkerState{
 		StateFilePath: stateFilePath,
 		State:         state,
+		lock:          &lock,
 	}
 
 	return workerState, nil
 }
 
 // flush current state to file
-func (ws WorkerState) UpdateState() error {
+// TODO lock
+func (ws *WorkerState) UpdateState() error {
+	ws.lock.Lock()
+	defer ws.lock.Unlock()
+
 	return utils.WriteJson(ws.StateFilePath, ws.State)
 }
 
