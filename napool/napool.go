@@ -27,6 +27,17 @@ func (naPools *NAPools) CallProxy(serviceType string, exp gopcp.CallResult, time
 	return client.Call(client.PcpClient.Call("proxy", serviceType, exp, timeout.Seconds()), timeout)
 }
 
+// (proxyById, serviceType, workerId, exp, timeout)
+func (naPools *NAPools) CallProxyById(serviceType string, workerId string, exp gopcp.CallResult, timeout time.Duration) (interface{}, error) {
+	client, err := naPools.GetRandomItem()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return client.Call(client.PcpClient.Call("proxyById", serviceType, workerId, exp, timeout.Seconds()), timeout)
+}
+
 func (naPools *NAPools) CallProxyStream(serviceType string, exp gopcp.CallResult, streamCallback gopcp_stream.StreamCallbackFunc, timeout time.Duration) (interface{}, error) {
 	client, err := naPools.GetRandomItem()
 
