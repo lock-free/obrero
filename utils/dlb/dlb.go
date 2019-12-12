@@ -15,9 +15,11 @@ type Worker struct {
 
 // Load balancer for workers
 type WorkerLB struct {
+	// {group:id:worker}
 	ActiveWorkerMap map[string]map[string]*Worker
-	ActiveWorkers   map[string][]*Worker
-	lock            sync.Mutex
+	// {group:[]worker}
+	ActiveWorkers map[string][]*Worker
+	lock          sync.Mutex
 }
 
 func GetWorkerLB() *WorkerLB {
@@ -74,6 +76,17 @@ func (wlb *WorkerLB) PickUpWorkerRandom(group string) (*Worker, bool) {
 
 	idx := rand.Intn(n)
 	return wlb.ActiveWorkers[group][idx], true
+}
+
+func (wlb *WorkerLB) PickUpWorkerById(group string, workerId string) (*Worker, bool) {
+	wlb.lock.Lock()
+	defer wlb.lock.Unlock()
+
+	if _, ok := wlb.ActiveWorkerMap[group]; !ok {
+		return nil, false
+	}
+	worker, ok := wlb.ActiveWorkerMap[group][workerId]
+	return worker, ok
 }
 
 // TODO support round-robin

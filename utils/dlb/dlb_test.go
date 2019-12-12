@@ -46,3 +46,18 @@ func TestRemoveFalsy(t *testing.T) {
 	wlb.AddWorker(w1)
 	utils.AssertEqual(t, wlb.RemoveWorker(w1), true, "")
 }
+
+func TestPickUpWorkerById(t *testing.T) {
+	wlb := GetWorkerLB()
+
+	w1 := Worker{Id: "0", Group: "a"}
+	w2 := Worker{Id: "1", Group: "a"}
+	wlb.AddWorker(w1)
+	wlb.AddWorker(w2)
+	_, ok := wlb.PickUpWorkerById("a", "0")
+	utils.AssertEqual(t, ok, true, "")
+	_, ok = wlb.PickUpWorkerById("a", "1")
+	utils.AssertEqual(t, ok, true, "")
+	_, ok = wlb.PickUpWorkerById("a", "2")
+	utils.AssertEqual(t, ok, false, "")
+}
