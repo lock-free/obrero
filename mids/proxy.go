@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-type GetWorkerHandlerFun func(string) (*gopcp_rpc.PCPConnectionHandler, error)
+type GetWorkerHandlerFun func(string, string) (*gopcp_rpc.PCPConnectionHandler, error)
 type GetCommandFun func(interface{}, string, int, interface{}, *gopcp.PcpServer) (string, error)
 
 type ProxyMid struct {
@@ -41,14 +41,46 @@ func (this *ProxyMid) Proxy(args []interface{}, attachment interface{}, pcpServe
 	)
 
 	err := utils.ParseArgs(args, []interface{}{&serviceType, &exp, &timeout}, "wrong signature, expect (xxx, serviceType: string, exp, timeout: int)")
-	exp = args[1]
 
 	if err != nil {
 		return nil, err
 	}
 
 	// pick worker handle
-	handle, err := this.GetWorkerHandler(serviceType)
+	handle, err := this.GetWorkerHandler(serviceType, "")
+	if err != nil {
+		return nil, err
+	}
+
+	// translate exp to command
+	cmd, err := this.GetCommand(exp, serviceType, timeout, attachment, pcpServer)
+	if err != nil {
+		return nil, err
+	}
+
+	// call real service
+	return handle.CallRemote(cmd, time.Duration(timeout)*time.Second)
+}
+
+// lazy sandbox
+// (xxx, serviceType, workerId, exp, timeout)
+func (this *ProxyMid) ProxyById(args []interface{}, attachment interface{}, pcpServer *gopcp.PcpServer) (interface{}, error) {
+	// parse params
+	var (
+		serviceType string
+		workerId    string
+		exp         interface{}
+		timeout     int
+	)
+
+	err := utils.ParseArgs(args, []interface{}{&serviceType, &workerId, &exp, &timeout}, "wrong signature, expect (xxx, serviceType: string, workerId: string, exp, timeout: int)")
+
+	if err != nil {
+		return nil, err
+	}
+
+	// pick worker handle
+	handle, err := this.GetWorkerHandler(serviceType, workerId)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +119,7 @@ func (this *ProxyMid) ProxyStream(streamProducer gopcp_stream.StreamProducer, ar
 	switch arr := jsonObj.(type) {
 	case []interface{}:
 		// choose worker
-		handle, err := this.GetWorkerHandler(serviceType)
+		handle, err := this.GetWorkerHandler(serviceType, "")
 		if err != nil {
 			return nil, err
 		}
