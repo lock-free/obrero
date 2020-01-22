@@ -18,6 +18,8 @@ github.com/lock-free/gopcp_rpc v0.0.0-20190920150227-7d0925f6c026 h1:mY3JSJmZyaW
 github.com/lock-free/gopcp_rpc v0.0.0-20190920150227-7d0925f6c026/go.mod h1:2BfNi14c1qP5Df7Pb8nKsU4QVJfTN6nvggkBro5YTIU=
 github.com/lock-free/gopcp_rpc v0.0.0-20200122090002-23245d514b9c h1:ejCUaxZqrrankj8kPbovjT9gmBQZOU1zrCDK2jlPF2E=
 github.com/lock-free/gopcp_rpc v0.0.0-20200122090002-23245d514b9c/go.mod h1:9gIYtOun127pni1i3Pj6YooXRVz/gbBuGUDQYYV+6HE=
+github.com/lock-free/gopcp_rpc v0.0.0-20200122095307-df151075d490 h1:xOYVnQCMkdZ7WsBqwbXV2Oqk3t1Dkmv1F/UJeOskyZY=
+github.com/lock-free/gopcp_rpc v0.0.0-20200122095307-df151075d490/go.mod h1:sJ32EiZx9zNPGtfOswp5qQ/oI9wEMz4yFMiQM8BRj7I=
 github.com/lock-free/gopcp_stream v0.0.0-20190920150102-eae38c487ee2 h1:Xe/hNV3O70UoqfCo2M4KHuxT8IMRCaQyBzJWbnpMF6I=
 github.com/lock-free/gopcp_stream v0.0.0-20190920150102-eae38c487ee2/go.mod h1:ozFeZLAmPWsBa3dB4y6PMgg+bb9/wbYfFhri42ylj/0=
 github.com/lock-free/gopool v0.0.0-20190611034900-329206275cf0 h1:uuCzjJn7tQjlJ1DznRIDePhrTS3QSHCNP7sULz9oESw=
