@@ -1,8 +1,11 @@
+github.com/creack/pty v1.1.7/go.mod h1:lj5s0c3V2DBrqTV7llrYr5NG6My20zk30Fl46Y7DoTY=
+github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/go-errors/errors v1.0.1 h1:LUHzmkK3GUKUrL/1gfBUxAHzcev3apQlezX/+O7ma6w=
 github.com/go-errors/errors v1.0.1/go.mod h1:f4zRHt4oKfwPJE5k8C9vpYG+aDHdBFUsgrm6/TyX73Q=
 github.com/kr/pretty v0.2.0 h1:s5hAObm+yFO5uHYt5dYjxi2rXrsnmRpJx4OYvIWUaQs=
 github.com/kr/pretty v0.2.0/go.mod h1:ipq/a2n7PKx3OHsz4KJII5eveXtPO4qwEXGdVfWzfnI=
 github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=
+github.com/kr/pty v1.1.8/go.mod h1:O1sed60cT9XZ5uDucP5qwvh+TE3NnUj51EiZO/lmSfw=
 github.com/kr/text v0.1.0 h1:45sCR5RtlFHMR4UwH9sdQ5TC8v0qDQCHnXt+kaKSTVE=
 github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
 github.com/lock-free/goaio v0.0.0-20190611034840-9d53a70585c6 h1:2rVS7kkSD7XkGCEXIli2ZEvspuUj+cZetg9RUwO7ftE=
@@ -13,6 +16,8 @@ github.com/lock-free/gopcp v0.0.0-20190920142302-f39bb882c4f9 h1:AlC1l4WAGnbQju9
 github.com/lock-free/gopcp v0.0.0-20190920142302-f39bb882c4f9/go.mod h1:2h3GyZHpYH0CoaPaiWfJuONVknSb5nzaU1Wg26QgQ7U=
 github.com/lock-free/gopcp_rpc v0.0.0-20190920150227-7d0925f6c026 h1:mY3JSJmZyaWkgYXTnVZgKbKQbXhEaG/3sNzQDnRbdVA=
 github.com/lock-free/gopcp_rpc v0.0.0-20190920150227-7d0925f6c026/go.mod h1:2BfNi14c1qP5Df7Pb8nKsU4QVJfTN6nvggkBro5YTIU=
+github.com/lock-free/gopcp_rpc v0.0.0-20200122090002-23245d514b9c h1:ejCUaxZqrrankj8kPbovjT9gmBQZOU1zrCDK2jlPF2E=
+github.com/lock-free/gopcp_rpc v0.0.0-20200122090002-23245d514b9c/go.mod h1:9gIYtOun127pni1i3Pj6YooXRVz/gbBuGUDQYYV+6HE=
 github.com/lock-free/gopcp_stream v0.0.0-20190920150102-eae38c487ee2 h1:Xe/hNV3O70UoqfCo2M4KHuxT8IMRCaQyBzJWbnpMF6I=
 github.com/lock-free/gopcp_stream v0.0.0-20190920150102-eae38c487ee2/go.mod h1:ozFeZLAmPWsBa3dB4y6PMgg+bb9/wbYfFhri42ylj/0=
 github.com/lock-free/gopool v0.0.0-20190611034900-329206275cf0 h1:uuCzjJn7tQjlJ1DznRIDePhrTS3QSHCNP7sULz9oESw=
