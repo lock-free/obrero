@@ -1,17 +1,14 @@
-GOPATH := $(shell cd ../../../.. && pwd)
-export GOPATH
+GO111MODULE := on
+export GO111MODULE
 
-init-dep:
-	@dep init
+init:
+	@go mod init
 
-dep:
-	@dep ensure
+clean:
+	@go mod tidy
 
-status-dep:
-	@dep status
-
-update-dep:
-	@dep ensure -update
+update:
+	@go list -m -u all
 
 test:
 	@go test -v -race
