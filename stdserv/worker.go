@@ -33,6 +33,7 @@ type StdWorkerConfig struct {
 	AppConfigFilePath *string
 	WorkerStartConf   *obrero.WorkerStartConf
 	BeforeStartWorker func()
+	Nonblocking       bool
 }
 
 // (pool, config pointer, stream)
@@ -102,5 +103,7 @@ func StartStdWorker(appConfig interface{}, appState interface{}, getBoxFuncMap G
 		return gopcp.GetSandbox(boxFuncMap)
 	}, workerStartConf)
 
-	utils.RunForever()
+	if !stdWorkerConfig.Nonblocking {
+		utils.RunForever()
+	}
 }
