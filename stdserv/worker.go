@@ -41,7 +41,7 @@ type GetBoxFuncMap = func(*napool.NAPools, *WorkerState, *gopcp_stream.StreamSer
 
 // appConfig: pointer of appConfig
 // appState: pointer of appState
-func StartStdWorker(appConfig interface{}, appState interface{}, getBoxFuncMap GetBoxFuncMap, stdWorkerConfig StdWorkerConfig) {
+func StartStdWorker(appConfig interface{}, appState interface{}, getBoxFuncMap GetBoxFuncMap, stdWorkerConfig StdWorkerConfig) napool.NAPools {
 	// read config from config file
 	appConfigFilePath := DEFAULT_APP_CONFIG
 	if stdWorkerConfig.AppConfigFilePath != nil {
@@ -106,4 +106,6 @@ func StartStdWorker(appConfig interface{}, appState interface{}, getBoxFuncMap G
 	if !stdWorkerConfig.Nonblocking {
 		utils.RunForever()
 	}
+
+	return naPools
 }
