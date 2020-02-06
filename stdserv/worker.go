@@ -104,9 +104,10 @@ func StartStdWorker(appConfig interface{}, appState interface{}, getBoxFuncMap G
 			return workerState.State.StateId, nil
 		})
 
-		klog.LogNormal("worker", fmt.Sprintf("start worker %s", stdWorkerConfig.ServiceName))
 		return gopcp.GetSandbox(boxFuncMap)
 	}, workerStartConf)
+
+	klog.LogNormal("worker", fmt.Sprintf("start worker %s", stdWorkerConfig.ServiceName))
 
 	if !stdWorkerConfig.Nonblocking {
 		utils.RunForever()
