@@ -10,14 +10,14 @@ import (
 )
 
 type GetWorkerHandlerFun func(string, string) (*gopcp_rpc.PCPConnectionHandler, error)
-type GetCommandFun func(interface{}, string, int, interface{}, *gopcp.PcpServer) (string, error)
+type GetCommandFun func(gopcp.FunNode, string, int, interface{}, *gopcp.PcpServer) (string, error)
 
 type ProxyMid struct {
 	GetWorkerHandler GetWorkerHandlerFun
 	GetCommand       GetCommandFun
 }
 
-func DefaultGetCommand(exp interface{}, serviceType string, timeout int, attachment interface{}, pcpServer *gopcp.PcpServer) (string, error) {
+func DefaultGetCommand(exp gopcp.FunNode, serviceType string, timeout int, attachment interface{}, pcpServer *gopcp.PcpServer) (string, error) {
 	// convert exp to json string
 	bs, err := gopcp.JSONMarshal(gopcp.ParseAstToJsonObject(exp))
 	if err != nil {
@@ -36,7 +36,7 @@ func (this *ProxyMid) Proxy(args []interface{}, attachment interface{}, pcpServe
 	// parse params
 	var (
 		serviceType string
-		exp         interface{}
+		exp         gopcp.FunNode
 		timeout     int
 	)
 
@@ -46,7 +46,7 @@ func (this *ProxyMid) Proxy(args []interface{}, attachment interface{}, pcpServe
 		return nil, err
 	}
 
-	fmt.Println("args %d, serviceType %d, exp %v, timeout %d", args, serviceType, exp, timeout)
+	fmt.Printf("args %v, serviceType %s, exp %v, timeout %d\n", args, serviceType, exp, timeout)
 
 	// pick worker handle
 	handle, err := this.GetWorkerHandler(serviceType, "")
@@ -71,7 +71,7 @@ func (this *ProxyMid) ProxyById(args []interface{}, attachment interface{}, pcpS
 	var (
 		serviceType string
 		workerId    string
-		exp         interface{}
+		exp         gopcp.FunNode
 		timeout     int
 	)
 
@@ -103,12 +103,11 @@ func (this *ProxyMid) ProxyStream(streamProducer gopcp_stream.StreamProducer, ar
 	// parse params
 	var (
 		serviceType string
-		exp         interface{}
+		exp         gopcp.FunNode
 		timeout     int
 	)
 
 	err := utils.ParseArgs(args, []interface{}{&serviceType, &exp, &timeout}, "wrong signature, expect (proxy, serviceType: string, exp, timeout: int)")
-	exp = args[1]
 
 	if err != nil {
 		return nil, err

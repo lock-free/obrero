@@ -39,6 +39,20 @@ func TestParseArgs3(t *testing.T) {
 	}}, []interface{}{&p}, "")
 }
 
+func TestParseArgs4(t *testing.T) {
+	type Person struct {
+		name string
+		age  int
+	}
+	var p1 Person
+
+	var p2 = Person{"a", 12}
+	ParseArgs([]interface{}{p2}, []interface{}{&p1}, "")
+
+	AssertEqual(t, p1.name, "a", "")
+	AssertEqual(t, p1.age, 12, "")
+}
+
 func TestParseArgMap(t *testing.T) {
 	var a int
 	var b string

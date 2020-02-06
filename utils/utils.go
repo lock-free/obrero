@@ -85,6 +85,11 @@ func ParseArgMap(argMap map[string]interface{}, pm map[string]interface{}, errMs
 }
 
 func ParseArg(arg interface{}, pointer interface{}) error {
+	// if arg and pointer have the same type, no need do marshal
+	if reflect.ValueOf(pointer).Elem().Type() == reflect.TypeOf(arg) {
+		reflect.ValueOf(pointer).Elem().Set(reflect.ValueOf(arg))
+	}
+
 	bs, err := json.Marshal(arg)
 	if err != nil {
 		return err
