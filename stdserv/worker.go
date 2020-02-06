@@ -83,10 +83,12 @@ func StartStdWorker(appConfig interface{}, appState interface{}, getBoxFuncMap G
 		stdWorkerConfig.BeforeStartWorker()
 	}
 
+	klog.LogNormal("worker", fmt.Sprintf("start worker %s", stdWorkerConfig.ServiceName))
 	naPools = obrero.StartWorker(func(s *gopcp_stream.StreamServer) *gopcp.Sandbox {
 		boxFuncMap := getBoxFuncMap(&naPools, workerState, s)
 
 		for key, boxFunc := range boxFuncMap {
+			klog.LogNormal("worker", fmt.Sprintf("register function%s", key))
 			// log function
 			boxFunc.Fun = mids.LogMid(key, boxFunc.Fun)
 		}
@@ -107,7 +109,7 @@ func StartStdWorker(appConfig interface{}, appState interface{}, getBoxFuncMap G
 		return gopcp.GetSandbox(boxFuncMap)
 	}, workerStartConf)
 
-	klog.LogNormal("worker", fmt.Sprintf("start worker %s", stdWorkerConfig.ServiceName))
+	klog.LogNormal("worker", fmt.Sprintf("started worker %s", stdWorkerConfig.ServiceName))
 
 	if !stdWorkerConfig.Nonblocking {
 		utils.RunForever()
