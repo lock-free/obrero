@@ -40,6 +40,8 @@ func (this *ProxyMid) Proxy(args []interface{}, attachment interface{}, pcpServe
 		timeout     int
 	)
 
+	fmt.Println("serviceType %d, exp %v, timeout %d", serviceType, exp, timeout)
+
 	err := utils.ParseArgs(args, []interface{}{&serviceType, &exp, &timeout}, "wrong signature, expect (xxx, serviceType: string, exp, timeout: int)")
 
 	if err != nil {
