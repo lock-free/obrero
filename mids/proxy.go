@@ -46,7 +46,7 @@ func (this *ProxyMid) Proxy(args []interface{}, attachment interface{}, pcpServe
 		return nil, err
 	}
 
-	fmt.Println("serviceType %d, exp %v, timeout %d", serviceType, exp, timeout)
+	fmt.Println("args %d, serviceType %d, exp %v, timeout %d", args, serviceType, exp, timeout)
 
 	// pick worker handle
 	handle, err := this.GetWorkerHandler(serviceType, "")
