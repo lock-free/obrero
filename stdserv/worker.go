@@ -2,6 +2,8 @@ package stdserv
 
 import (
 	"errors"
+	"fmt"
+	"github.com/lock-free/goklog"
 	"github.com/lock-free/gopcp"
 	"github.com/lock-free/gopcp_stream"
 	"github.com/lock-free/obrero"
@@ -10,6 +12,8 @@ import (
 	"github.com/lock-free/obrero/utils"
 	"time"
 )
+
+var klog = goklog.GetInstance()
 
 // define standard worker
 // (1) read configuration from /data/app.json
@@ -100,6 +104,7 @@ func StartStdWorker(appConfig interface{}, appState interface{}, getBoxFuncMap G
 			return workerState.State.StateId, nil
 		})
 
+		klog.LogNormal("worker", fmt.Sprintf("start worker %s", stdWorkerConfig.ServiceName))
 		return gopcp.GetSandbox(boxFuncMap)
 	}, workerStartConf)
 
