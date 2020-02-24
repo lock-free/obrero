@@ -114,7 +114,7 @@ func StartStdWorker(appConfig interface{}, appState interface{}, getBoxFuncMap G
 
 	// after start worker
 	if stdWorkerConfig.AfterStartWorker != nil {
-		stdWorkerConfig.AfterStartWorker(naPools)
+		stdWorkerConfig.AfterStartWorker(&naPools)
 	}
 
 	if !stdWorkerConfig.Nonblocking {
