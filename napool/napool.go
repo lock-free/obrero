@@ -102,6 +102,9 @@ func (naPools *NAPools) getRandomItem(tryCount int, maxCount int) (interface{}, 
 	}
 
 	// pick up a random na pool.
+	if len(naPools.Pools) == 0 {
+		return nil, errors.New("empty pools")
+	}
 	index := rand.Intn(len(naPools.Pools))
 
 	item, err := naPools.Pools[index].Get()
