@@ -37,6 +37,7 @@ type StdWorkerConfig struct {
 	AppConfigFilePath *string
 	WorkerStartConf   *obrero.WorkerStartConf
 	BeforeStartWorker func()
+	AfterStartWorker  func(*napool.NAPools)
 	Nonblocking       bool
 }
 
@@ -88,7 +89,7 @@ func StartStdWorker(appConfig interface{}, appState interface{}, getBoxFuncMap G
 		boxFuncMap := getBoxFuncMap(&naPools, workerState, s)
 
 		for key, boxFunc := range boxFuncMap {
-			klog.LogNormal("worker", fmt.Sprintf("register function%s", key))
+			klog.LogNormal("worker", fmt.Sprintf("register function %s", key))
 			// log function
 			boxFunc.Fun = mids.LogMid(key, boxFunc.Fun)
 		}
@@ -110,6 +111,11 @@ func StartStdWorker(appConfig interface{}, appState interface{}, getBoxFuncMap G
 	}, workerStartConf)
 
 	klog.LogNormal("worker", fmt.Sprintf("started worker %s", stdWorkerConfig.ServiceName))
+
+	// after start worker
+	if stdWorkerConfig.AfterStartWorker != nil {
+		stdWorkerConfig.AfterStartWorker(naPools)
+	}
 
 	if !stdWorkerConfig.Nonblocking {
 		utils.RunForever()
