@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -141,4 +142,35 @@ func Pick(m map[string]interface{}, fields []string) map[string]interface{} {
 	}
 
 	return ans
+}
+
+// @params chs chars need to be escaped
+func Escape(text string, e rune, chs map[rune]bool) string {
+	var letters []rune
+	for _, letter := range text {
+		if _, ok := chs[letter]; letter == e || ok {
+			letters = append(letters, e) // add escape letter
+		}
+		letters = append(letters, letter)
+	}
+	return string(letters)
+}
+
+func UnEscape(text string, e rune) (string, error) {
+	var letters []rune
+	source := []rune(text)
+	var i = 0
+	var slen = len(source)
+	for i < slen {
+		if source[i] == e {
+			i++
+			if i == slen {
+				return "", errors.New("no char after an escape letter")
+			}
+		}
+
+		letters = append(letters, source[i])
+		i++
+	}
+	return string(letters), nil
 }

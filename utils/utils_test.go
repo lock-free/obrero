@@ -82,3 +82,14 @@ func TestAssign(t *testing.T) {
 		true,
 		"")
 }
+
+func TestEscape(t *testing.T) {
+	AssertEqual(t, Escape("abcd.edf", '.', map[rune]bool{}), "abcd..edf", "")
+	AssertEqual(t, Escape(`abcd"edf`, '\\', map[rune]bool{'"': true}), `abcd\"edf`, "")
+}
+
+func TestUnEscape(t *testing.T) {
+	v, err := UnEscape("abcd..edf", '.')
+	AssertEqual(t, err, nil, "")
+	AssertEqual(t, v, "abcd.edf", "")
+}
