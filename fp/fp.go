@@ -1,4 +1,4 @@
-package operation
+package fp
 
 import (
 	"errors"
@@ -55,4 +55,45 @@ func Get(value interface{}, jsonPath string) (interface{}, error) {
 	}
 
 	return cur, nil
+}
+
+type MapItem func(interface{}) (interface{}, error)
+
+func Map(list interface{}, mapItem MapItem) ([]interface{}, error) {
+	switch items := list.(type) {
+	case []interface{}:
+		var ans []interface{}
+		for _, v := range items {
+			n, err := mapItem(v)
+			if err != nil {
+				return nil, err
+			}
+			ans = append(ans, n)
+		}
+		return ans, nil
+	default:
+		return nil, errors.New("Expect []interface type")
+	}
+}
+
+type Predicate func(interface{}) (bool, error)
+
+func Filter(list interface{}, predicate Predicate) (interface{}, error) {
+	switch items := list.(type) {
+	case []interface{}:
+		var ans []interface{}
+		for _, v := range items {
+			// TODO recover from panic
+			pass, err := predicate(v)
+			if err != nil {
+				return nil, err
+			}
+			if pass {
+				ans = append(ans, v)
+			}
+		}
+		return ans, nil
+	default:
+		return nil, errors.New("Expect []interface type")
+	}
 }
