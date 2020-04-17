@@ -32,3 +32,12 @@ func TestFilter(t *testing.T) {
 	utils.AssertEqual(t, err, nil, "")
 	utils.AssertEqual(t, ans, []interface{}{3, 4}, "")
 }
+
+func TestGet(t *testing.T) {
+	ans, err := Eva(
+		Get([]interface{}{1, 2, 3}, "1"),
+	)
+
+	utils.AssertEqual(t, err, nil, "")
+	utils.AssertEqual(t, ans, 2, "")
+}

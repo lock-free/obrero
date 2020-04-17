@@ -2,6 +2,7 @@ package lazy
 
 import (
 	"errors"
+	"github.com/lock-free/obrero/fp/operation"
 )
 
 type LazyValue interface {
@@ -64,6 +65,19 @@ func Map(v interface{}, mapItem MapItem) LazyValue {
 			default:
 				return nil, errors.New("Expect []interface type")
 			}
+		},
+	}
+}
+
+func Get(v interface{}, path string) LazyValue {
+	return FunctionLazyValue{
+		eval: func() (interface{}, error) {
+			item, err := Eva(v)
+			if err != nil {
+				return nil, err
+			}
+
+			return operation.Get(item, path)
 		},
 	}
 }
