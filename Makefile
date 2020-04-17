@@ -15,6 +15,7 @@ test:
 	@cd ./utils && go test -v -race
 	@cd ./utils/cq && go test -v -race
 	@cd ./utils/dlb && go test -v -race
+	@cd ./utils/dta && go test -v -race
 	@cd ./mids && go test -v -race
 	@cd ./mids/httpmids && go test -v -race
 	@cd ./box/cqbox && go test -v -race
