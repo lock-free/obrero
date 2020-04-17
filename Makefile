@@ -11,17 +11,7 @@ update:
 	@go get -u
 
 test:
-	@go test -v -race
-	@cd ./utils && go test -v -race
-	@cd ./utils/cq && go test -v -race
-	@cd ./utils/dlb && go test -v -race
-	@cd ./utils/dta && go test -v -race
-	@cd ./mids && go test -v -race
-	@cd ./mids/httpmids && go test -v -race
-	@cd ./box/cqbox && go test -v -race
-	@cd ./stdserv && go test -v -race
-	@cd ./model && go test -v -race
-	@cd ./model/entowner && go test -v -race
+	@go test ./... -v -race
 
 cover:
 	@go test -coverprofile=coverage.out && go tool cover -html=coverage.out

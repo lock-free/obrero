@@ -1,4 +1,4 @@
-package dta
+package operation
 
 import (
 	"github.com/lock-free/obrero/utils"
