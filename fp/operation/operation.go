@@ -56,7 +56,3 @@ func Get(value interface{}, jsonPath string) (interface{}, error) {
 
 	return cur, nil
 }
-
-func List(args ...interface{}) []interface{} {
-	return args
-}

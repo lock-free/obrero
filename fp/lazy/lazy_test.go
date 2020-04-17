@@ -41,3 +41,14 @@ func TestGet(t *testing.T) {
 	utils.AssertEqual(t, err, nil, "")
 	utils.AssertEqual(t, ans, 2, "")
 }
+
+func TestFunctor(t *testing.T) {
+	ans, err := Eva(
+		Functor(Data(10, nil), func(v interface{}) (interface{}, error) {
+			return v.(int) + 10, nil
+		}),
+	)
+
+	utils.AssertEqual(t, err, nil, "")
+	utils.AssertEqual(t, ans, 20, "")
+}

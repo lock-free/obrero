@@ -15,7 +15,7 @@ func TestGet(t *testing.T) {
 	}{
 		{
 			"list-0",
-			List(1, 2, 3),
+			[]interface{}{1, 2, 3},
 			"0",
 			1,
 			nil,

@@ -2,6 +2,7 @@ package lazy
 
 import (
 	"errors"
+	"fmt"
 	"github.com/lock-free/obrero/fp/operation"
 )
 
@@ -38,11 +39,29 @@ type FunctionLazyValue struct {
 	eval func() (interface{}, error)
 }
 
-func (t FunctionLazyValue) Eva() (interface{}, error) {
-	return t.eval()
+func (t FunctionLazyValue) Eva() (ans interface{}, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("%v", r)
+		}
+	}()
+	ans, err = t.eval()
+	return
 }
 
 type MapItem func(interface{}) (interface{}, error)
+
+func Functor(v interface{}, mapItem MapItem) LazyValue {
+	return FunctionLazyValue{
+		eval: func() (interface{}, error) {
+			item, err := Eva(v)
+			if err != nil {
+				return nil, err
+			}
+			return mapItem(item)
+		},
+	}
+}
 
 func Map(v interface{}, mapItem MapItem) LazyValue {
 	return FunctionLazyValue{
