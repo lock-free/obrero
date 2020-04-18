@@ -92,11 +92,46 @@ func Set(source interface{}, jsonPath string, value interface{}) (interface{}, e
 	return source, nil
 }
 
+type ItemHandler func(interface{}) error
+
+func ForEach(list interface{}, itemHandler ItemHandler) error {
+	switch items := list.(type) {
+	case []interface{}:
+		for _, v := range items {
+			err := itemHandler(v)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	case map[string]interface{}:
+		for _, v := range items {
+			err := itemHandler(v)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	default:
+		return errors.New("Expect []interface type")
+	}
+}
+
 type MapItem func(interface{}) (interface{}, error)
 
 func Map(list interface{}, mapItem MapItem) ([]interface{}, error) {
 	switch items := list.(type) {
 	case []interface{}:
+		var ans []interface{}
+		for _, v := range items {
+			n, err := mapItem(v)
+			if err != nil {
+				return nil, err
+			}
+			ans = append(ans, n)
+		}
+		return ans, nil
+	case map[string]interface{}:
 		var ans []interface{}
 		for _, v := range items {
 			n, err := mapItem(v)
@@ -118,7 +153,18 @@ func Filter(list interface{}, predicate Predicate) (interface{}, error) {
 	case []interface{}:
 		var ans []interface{}
 		for _, v := range items {
-			// TODO recover from panic
+			pass, err := predicate(v)
+			if err != nil {
+				return nil, err
+			}
+			if pass {
+				ans = append(ans, v)
+			}
+		}
+		return ans, nil
+	case map[string]interface{}:
+		var ans []interface{}
+		for _, v := range items {
 			pass, err := predicate(v)
 			if err != nil {
 				return nil, err
@@ -138,7 +184,18 @@ func FilterIndex(list interface{}, predicate Predicate) (interface{}, error) {
 	case []interface{}:
 		var ans []interface{}
 		for index, v := range items {
-			// TODO recover from panic
+			pass, err := predicate(v)
+			if err != nil {
+				return nil, err
+			}
+			if pass {
+				ans = append(ans, index)
+			}
+		}
+		return ans, nil
+	case map[string]interface{}:
+		var ans []interface{}
+		for index, v := range items {
 			pass, err := predicate(v)
 			if err != nil {
 				return nil, err
