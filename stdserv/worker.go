@@ -91,7 +91,7 @@ func StartStdWorker(appConfig interface{}, appState interface{}, getBoxFuncMap G
 		for key, boxFunc := range boxFuncMap {
 			klog.LogNormal("worker", fmt.Sprintf("register function %s", key))
 			// log function
-			boxFunc.Fun = mids.RecoverMid(mids.LogMid(key, boxFunc.Fun))
+			boxFunc.Fun = mids.RecoverMid(fmt.Sprintf("panic at %s:%s", stdWorkerConfig.ServiceName, key), mids.LogMid(key, boxFunc.Fun))
 		}
 
 		// default get service type function
