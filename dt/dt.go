@@ -16,10 +16,12 @@ import (
 // get value by json path
 // type explaination
 func Get(value interface{}, jsonPath string) (interface{}, error) {
-	var cur = value
-
 	parts := strings.Split(jsonPath, ".")
+	return getByJsonPath(value, parts)
+}
 
+func getByJsonPath(value interface{}, parts []string) (interface{}, error) {
+	var cur = value
 	for _, part := range parts {
 		if part != "" {
 			// check if it is number
@@ -30,7 +32,7 @@ func Get(value interface{}, jsonPath string) (interface{}, error) {
 				if ok {
 					// out of boundry
 					if num < 0 || num > len(nextObjectParent) {
-						return nil, errors.New("missing value for path: " + jsonPath + ". Out of range. Array length is " + strconv.Itoa(len(nextObjectParent)) + ".")
+						return nil, fmt.Errorf("missing value. Out of range.")
 					}
 					nextObject := nextObjectParent[num]
 					cur = nextObject
@@ -41,13 +43,13 @@ func Get(value interface{}, jsonPath string) (interface{}, error) {
 			// otherwise regarding as map
 			nextObjectParent, ok := cur.(map[string]interface{})
 			if !ok {
-				return nil, errors.New("Can not go deeper for this jsonPath: " + jsonPath + ". Type of current object is " + fmt.Sprintf("%v", reflect.TypeOf(cur)))
+				return nil, fmt.Errorf("Can not go deeper. Type of current object is %v", reflect.TypeOf(cur))
 			}
 
 			nextObject, ok := nextObjectParent[part]
 
 			if !ok {
-				return nil, errors.New("missing value for path: " + jsonPath)
+				return nil, errors.New("missing value")
 			} else {
 				cur = nextObject
 			}
@@ -55,6 +57,39 @@ func Get(value interface{}, jsonPath string) (interface{}, error) {
 	}
 
 	return cur, nil
+}
+
+func Set(source interface{}, jsonPath string, value interface{}) (interface{}, error) {
+	parts := strings.Split(jsonPath, ".")
+	if len(parts) <= 0 {
+		return value, nil
+	}
+	obj, err := getByJsonPath(source, parts[:len(parts)-1])
+	if err != nil {
+		return nil, err
+	}
+
+	key := parts[len(parts)-1]
+
+	// try array
+	if num, err := strconv.Atoi(key); err != nil {
+		list, ok := obj.([]interface{})
+		if ok {
+			if num < 0 || num > len(list) {
+				return nil, fmt.Errorf("Out of range When Set. Array length is %d", len(list))
+			}
+			list[num] = value
+		}
+	}
+
+	// try map
+	m, ok := obj.(map[string]interface{})
+	if !ok {
+		return nil, errors.New("Expect map")
+	}
+	m[key] = value
+
+	return source, nil
 }
 
 type MapItem func(interface{}) (interface{}, error)

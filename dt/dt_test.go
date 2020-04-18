@@ -48,3 +48,14 @@ func TestFilter(t *testing.T) {
 	utils.AssertEqual(t, err, nil, "")
 	utils.AssertEqual(t, ans, []interface{}{2, 3}, "")
 }
+
+func TestSet(t *testing.T) {
+	v, err := Set(map[string]interface{}{
+		"a": 10,
+	}, "a", 20)
+
+	utils.AssertEqual(t, err, nil, "")
+	utils.AssertEqual(t, v, map[string]interface{}{
+		"a": 20,
+	}, "")
+}
