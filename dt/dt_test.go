@@ -32,7 +32,7 @@ func TestGet(t *testing.T) {
 }
 
 func TestMap(t *testing.T) {
-	ans, err := Map([]interface{}{1, 2, 3}, func(v interface{}) (interface{}, error) {
+	ans, err := Map([]interface{}{1, 2, 3}, func(v, index interface{}) (interface{}, error) {
 		return v.(int) + 1, nil
 	})
 
@@ -41,7 +41,7 @@ func TestMap(t *testing.T) {
 }
 
 func TestFilter(t *testing.T) {
-	ans, err := Filter([]interface{}{1, 2, 3}, func(v interface{}) (bool, error) {
+	ans, err := Filter([]interface{}{1, 2, 3}, func(v, index interface{}) (bool, error) {
 		return v.(int)+1 > 2, nil
 	})
 

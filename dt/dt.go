@@ -92,21 +92,21 @@ func Set(source interface{}, jsonPath string, value interface{}) (interface{}, e
 	return source, nil
 }
 
-type ItemHandler func(interface{}) error
+type ItemHandler func(interface{}, interface{}) error
 
 func ForEach(list interface{}, itemHandler ItemHandler) error {
 	switch items := list.(type) {
 	case []interface{}:
-		for _, v := range items {
-			err := itemHandler(v)
+		for index, v := range items {
+			err := itemHandler(v, index)
 			if err != nil {
 				return err
 			}
 		}
 		return nil
 	case map[string]interface{}:
-		for _, v := range items {
-			err := itemHandler(v)
+		for index, v := range items {
+			err := itemHandler(v, index)
 			if err != nil {
 				return err
 			}
@@ -117,14 +117,14 @@ func ForEach(list interface{}, itemHandler ItemHandler) error {
 	}
 }
 
-type MapItem func(interface{}) (interface{}, error)
+type MapItem func(interface{}, interface{}) (interface{}, error)
 
 func Map(list interface{}, mapItem MapItem) ([]interface{}, error) {
 	switch items := list.(type) {
 	case []interface{}:
 		var ans []interface{}
-		for _, v := range items {
-			n, err := mapItem(v)
+		for index, v := range items {
+			n, err := mapItem(v, index)
 			if err != nil {
 				return nil, err
 			}
@@ -133,8 +133,8 @@ func Map(list interface{}, mapItem MapItem) ([]interface{}, error) {
 		return ans, nil
 	case map[string]interface{}:
 		var ans []interface{}
-		for _, v := range items {
-			n, err := mapItem(v)
+		for index, v := range items {
+			n, err := mapItem(v, index)
 			if err != nil {
 				return nil, err
 			}
@@ -146,26 +146,32 @@ func Map(list interface{}, mapItem MapItem) ([]interface{}, error) {
 	}
 }
 
-func MapIndex(list interface{}, mapItem MapItem) ([]interface{}, error) {
+type Accumulator func(interface{}, interface{}, interface{}) (interface{}, error)
+
+func Reduce(list interface{}, acc Accumulator, initial interface{}) (interface{}, error) {
 	switch items := list.(type) {
 	case []interface{}:
-		var ans []interface{}
-		for index, _ := range items {
-			n, err := mapItem(index)
+		var (
+			ans       = initial
+			err error = nil
+		)
+		for index, v := range items {
+			ans, err = acc(ans, v, index)
 			if err != nil {
 				return nil, err
 			}
-			ans = append(ans, n)
 		}
 		return ans, nil
 	case map[string]interface{}:
-		var ans []interface{}
-		for index, _ := range items {
-			n, err := mapItem(index)
+		var (
+			ans       = initial
+			err error = nil
+		)
+		for index, v := range items {
+			ans, err = acc(ans, v, index)
 			if err != nil {
 				return nil, err
 			}
-			ans = append(ans, n)
 		}
 		return ans, nil
 	default:
@@ -173,14 +179,14 @@ func MapIndex(list interface{}, mapItem MapItem) ([]interface{}, error) {
 	}
 }
 
-type Predicate func(interface{}) (bool, error)
+type Predicate func(interface{}, interface{}) (bool, error)
 
 func Filter(list interface{}, predicate Predicate) (interface{}, error) {
 	switch items := list.(type) {
 	case []interface{}:
 		var ans []interface{}
-		for _, v := range items {
-			pass, err := predicate(v)
+		for index, v := range items {
+			pass, err := predicate(v, index)
 			if err != nil {
 				return nil, err
 			}
@@ -191,44 +197,13 @@ func Filter(list interface{}, predicate Predicate) (interface{}, error) {
 		return ans, nil
 	case map[string]interface{}:
 		var ans []interface{}
-		for _, v := range items {
-			pass, err := predicate(v)
+		for index, v := range items {
+			pass, err := predicate(v, index)
 			if err != nil {
 				return nil, err
 			}
 			if pass {
 				ans = append(ans, v)
-			}
-		}
-		return ans, nil
-	default:
-		return nil, errors.New("Expect []interface type")
-	}
-}
-
-func FilterIndex(list interface{}, predicate Predicate) (interface{}, error) {
-	switch items := list.(type) {
-	case []interface{}:
-		var ans []interface{}
-		for index, v := range items {
-			pass, err := predicate(v)
-			if err != nil {
-				return nil, err
-			}
-			if pass {
-				ans = append(ans, index)
-			}
-		}
-		return ans, nil
-	case map[string]interface{}:
-		var ans []interface{}
-		for index, v := range items {
-			pass, err := predicate(v)
-			if err != nil {
-				return nil, err
-			}
-			if pass {
-				ans = append(ans, index)
 			}
 		}
 		return ans, nil
