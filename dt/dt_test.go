@@ -1,4 +1,4 @@
-package fp
+package dt
 
 import (
 	"github.com/lock-free/obrero/utils"
