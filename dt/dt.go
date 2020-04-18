@@ -97,3 +97,7 @@ func Filter(list interface{}, predicate Predicate) (interface{}, error) {
 		return nil, errors.New("Expect []interface type")
 	}
 }
+
+func Falsy(v interface{}) bool {
+	return v == nil || v == false || v == 0 || v == ""
+}
