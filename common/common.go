@@ -9,7 +9,6 @@ import (
 
 // return entity if exists, otherwise, return nil
 func GetEntityIfExist(naPools *napool.NAPools, entityKey string, entityID string) (interface{}, error) {
-	// check if user is VIP
 	v, err := naPools.SimpleCall("model_obrero", "hasEntity", entityKey, entityID)
 	if err != nil {
 		return nil, err
@@ -18,4 +17,21 @@ func GetEntityIfExist(naPools *napool.NAPools, entityKey string, entityID string
 		return nil, nil
 	}
 	return naPools.SimpleCall("model_obrero", "getEntity", entityKey, entityID)
+}
+
+func GetOrSetEntity(naPools *napool.NAPools, entityKey string, entityID string, entity map[string]interface{}) (interface{}, error) {
+	v, err := GetEntityIfExist(naPools, entityKey, entityID)
+	if err != nil {
+		return nil, err
+	}
+
+	if v == nil {
+		_, err = naPools.SimpleCall("model_obrero", "setEntity", entityKey, entityID, entity)
+		if err != nil {
+			return nil, err
+		}
+		return entity, nil
+	}
+
+	return v, nil
 }
