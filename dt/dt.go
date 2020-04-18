@@ -212,6 +212,37 @@ func Filter(list interface{}, predicate Predicate) (interface{}, error) {
 	}
 }
 
+func FilterIndex(list interface{}, predicate Predicate) (interface{}, error) {
+	switch items := list.(type) {
+	case []interface{}:
+		var ans []interface{}
+		for index, v := range items {
+			pass, err := predicate(v, index)
+			if err != nil {
+				return nil, err
+			}
+			if pass {
+				ans = append(ans, index)
+			}
+		}
+		return ans, nil
+	case map[string]interface{}:
+		var ans []interface{}
+		for index, v := range items {
+			pass, err := predicate(v, index)
+			if err != nil {
+				return nil, err
+			}
+			if pass {
+				ans = append(ans, index)
+			}
+		}
+		return ans, nil
+	default:
+		return nil, errors.New("Expect []interface type")
+	}
+}
+
 func Falsy(v interface{}) bool {
 	return v == nil || v == false || v == 0 || v == ""
 }
