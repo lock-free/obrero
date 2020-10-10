@@ -8,8 +8,8 @@ import (
 func TestBase(t *testing.T) {
 	wlb := GetWorkerLB()
 
-	w1 := Worker{Id: "0", Group: "a"}
-	w2 := Worker{Id: "1", Group: "a"}
+	w1 := &Worker{Id: "0", Group: "a"}
+	w2 := &Worker{Id: "1", Group: "a"}
 	wlb.AddWorker(w1)
 	wlb.AddWorker(w2)
 
@@ -38,8 +38,8 @@ func TestBase(t *testing.T) {
 func TestRemoveFalsy(t *testing.T) {
 	wlb := GetWorkerLB()
 
-	w1 := Worker{Id: "0", Group: "a"}
-	w2 := Worker{Id: "1", Group: "a"}
+	w1 := &Worker{Id: "0", Group: "a"}
+	w2 := &Worker{Id: "1", Group: "a"}
 	utils.AssertEqual(t, wlb.RemoveWorker(w1), false, "")
 	wlb.AddWorker(w2)
 	utils.AssertEqual(t, wlb.RemoveWorker(w2), true, "")
@@ -50,8 +50,8 @@ func TestRemoveFalsy(t *testing.T) {
 func TestPickUpWorkerById(t *testing.T) {
 	wlb := GetWorkerLB()
 
-	w1 := Worker{Id: "0", Group: "a"}
-	w2 := Worker{Id: "1", Group: "a"}
+	w1 := &Worker{Id: "0", Group: "a"}
+	w2 := &Worker{Id: "1", Group: "a"}
 	wlb.AddWorker(w1)
 	wlb.AddWorker(w2)
 	_, ok := wlb.PickUpWorkerById("a", "0")

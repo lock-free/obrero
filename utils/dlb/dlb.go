@@ -7,18 +7,19 @@ import (
 )
 
 type Worker struct {
-	Id     string
-	Group  string
-	idx    int
-	Handle interface{}
+	Id     string      // identity of worker
+	Group  string      // for each worker, they belongs to one group
+	Info   string      // some extra information
+	idx    int         `json:"-"`
+	Handle interface{} `json:"-"`
 }
 
 // Load balancer for workers
 type WorkerLB struct {
 	// {group:id:worker}
-	ActiveWorkerMap map[string]map[string]*Worker
+	activeWorkerMap map[string]map[string]*Worker
 	// {group:[]worker}
-	ActiveWorkers map[string][]*Worker
+	activeWorkers map[string][]*Worker
 	lock          sync.Mutex
 }
 
@@ -26,41 +27,41 @@ func GetWorkerLB() *WorkerLB {
 	return &WorkerLB{make(map[string]map[string]*Worker), make(map[string][]*Worker), sync.Mutex{}}
 }
 
-func (wlb *WorkerLB) AddWorker(worker Worker) {
+func (wlb *WorkerLB) AddWorker(worker *Worker) {
 	wlb.lock.Lock()
 	defer wlb.lock.Unlock()
 
 	// push to the tail
-	worker.idx = len(wlb.ActiveWorkers[worker.Group])
-	wlb.ActiveWorkers[worker.Group] = append(wlb.ActiveWorkers[worker.Group], &worker)
+	worker.idx = len(wlb.activeWorkers[worker.Group])
+	wlb.activeWorkers[worker.Group] = append(wlb.activeWorkers[worker.Group], worker)
 
 	// update map
-	if _, ok := wlb.ActiveWorkerMap[worker.Group]; !ok {
-		wlb.ActiveWorkerMap[worker.Group] = make(map[string]*Worker)
+	if _, ok := wlb.activeWorkerMap[worker.Group]; !ok {
+		wlb.activeWorkerMap[worker.Group] = make(map[string]*Worker)
 	}
-	wlb.ActiveWorkerMap[worker.Group][worker.Id] = &worker
+	wlb.activeWorkerMap[worker.Group][worker.Id] = worker
 }
 
-func (wlb *WorkerLB) RemoveWorker(worker Worker) bool {
+func (wlb *WorkerLB) RemoveWorker(worker *Worker) bool {
 	wlb.lock.Lock()
 	defer wlb.lock.Unlock()
 
-	if _, ok := wlb.ActiveWorkerMap[worker.Group][worker.Id]; !ok {
+	if _, ok := wlb.activeWorkerMap[worker.Group][worker.Id]; !ok {
 		return false
 	}
 
 	// use last worker overrides current worker
-	lastWorker := wlb.ActiveWorkers[worker.Group][len(wlb.ActiveWorkers[worker.Group])-1]
+	lastWorker := wlb.activeWorkers[worker.Group][len(wlb.activeWorkers[worker.Group])-1]
 	lastWorker.idx = worker.idx
-	wlb.ActiveWorkers[worker.Group][lastWorker.idx] = lastWorker
+	wlb.activeWorkers[worker.Group][lastWorker.idx] = lastWorker
 	// remove last one
-	wlb.ActiveWorkers[worker.Group] = wlb.ActiveWorkers[worker.Group][:len(wlb.ActiveWorkers[worker.Group])-1]
+	wlb.activeWorkers[worker.Group] = wlb.activeWorkers[worker.Group][:len(wlb.activeWorkers[worker.Group])-1]
 
 	// update map
-	delete(wlb.ActiveWorkerMap[worker.Group], worker.Id)
-	if len(wlb.ActiveWorkerMap[worker.Group]) == 0 {
-		delete(wlb.ActiveWorkerMap, worker.Group)
-		delete(wlb.ActiveWorkers, worker.Group)
+	delete(wlb.activeWorkerMap[worker.Group], worker.Id)
+	if len(wlb.activeWorkerMap[worker.Group]) == 0 {
+		delete(wlb.activeWorkerMap, worker.Group)
+		delete(wlb.activeWorkers, worker.Group)
 	}
 	return true
 }
@@ -69,24 +70,28 @@ func (wlb *WorkerLB) PickUpWorkerRandom(group string) (*Worker, bool) {
 	wlb.lock.Lock()
 	defer wlb.lock.Unlock()
 
-	n := len(wlb.ActiveWorkers[group])
+	n := len(wlb.activeWorkers[group])
 	if n <= 0 {
 		return nil, false
 	}
 
 	idx := rand.Intn(n)
-	return wlb.ActiveWorkers[group][idx], true
+	return wlb.activeWorkers[group][idx], true
 }
 
 func (wlb *WorkerLB) PickUpWorkerById(group string, workerId string) (*Worker, bool) {
 	wlb.lock.Lock()
 	defer wlb.lock.Unlock()
 
-	if _, ok := wlb.ActiveWorkerMap[group]; !ok {
+	if _, ok := wlb.activeWorkerMap[group]; !ok {
 		return nil, false
 	}
-	worker, ok := wlb.ActiveWorkerMap[group][workerId]
+	worker, ok := wlb.activeWorkerMap[group][workerId]
 	return worker, ok
+}
+
+func (wlb *WorkerLB) GetActiveWorkerMap() map[string]map[string]*Worker {
+	return wlb.activeWorkerMap
 }
 
 // TODO support round-robin
