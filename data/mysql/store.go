@@ -112,3 +112,15 @@ func CountByFields(naPools *napool.NAPools, dbName, tableName string, fields map
 
 	return 0, nil
 }
+
+func ExistsByFields(naPools *napool.NAPools, dbName, tableName string, fields map[string]interface{}) (bool, error) {
+	c, err := CountByFields(naPools, dbName, tableName, fields)
+	if err != nil {
+		return false, err
+	}
+
+	if c == 0 {
+		return false, nil
+	}
+	return true, nil
+}
