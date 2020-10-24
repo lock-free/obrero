@@ -3,7 +3,7 @@ module github.com/lock-free/obrero
 go 1.12
 
 require (
-	github.com/LoveKino/model_sql v0.0.0-20201024071611-9250b0f57810
+	github.com/LoveKino/model_sql v0.0.0-20201024135630-e53f46f65590
 	github.com/go-errors/errors v1.0.1 // indirect
 	github.com/lock-free/goklog v0.0.0-20190805025942-ee6028c56a50
 	github.com/lock-free/gopcp v0.0.0-20201003174023-e1bac94d9ff6
