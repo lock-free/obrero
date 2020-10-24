@@ -13,7 +13,7 @@ var pcpClient = gopcp.PcpClient{}
 // TODO options
 func Upsert(naPools *napool.NAPools, dbName, tableName string, model interface{}, primary []string) (interface{}, error) {
 	// get upsert sql
-	sql, err := model_sql.GetUpsertSQL("payment", model, []string{"pay_id"})
+	sql, err := model_sql.GetUpsertSQL("payment", model, primary)
 	if err != nil {
 		return nil, err
 	}
