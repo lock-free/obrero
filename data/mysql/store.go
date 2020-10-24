@@ -102,12 +102,12 @@ func CountByFields(naPools *napool.NAPools, dbName, tableName string, fields map
 
 	// get count
 	for _, v := range models[0] {
-		c, ok := v.(uint64)
+		c, ok := v.(float64)
 		if !ok {
 			return 0, errors.New("unexpect value type for count(*)")
 		}
 
-		return c, nil
+		return uint64(c), nil
 	}
 
 	return 0, nil

@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	github.com/LoveKino/model_sql v0.0.0-20201024182425-cf16f0ee3118
+	github.com/go-errors/errors v1.1.1 // indirect
 	github.com/lock-free/goklog v0.0.0-20190805025942-ee6028c56a50
 	github.com/lock-free/gopcp v0.0.0-20201003174023-e1bac94d9ff6
 	github.com/lock-free/gopcp_rpc v0.0.0-20201003175801-77c2a1124a26
